@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import TrustedBy from './TrustedBy';
+import { getMediaUrl } from '../utils/media';
 
 interface HeroSettings {
   heroSubtitle: string;
@@ -47,7 +48,7 @@ export default function Hero() {
           muted
           playsInline
           className="w-full h-full object-cover opacity-40"
-          src={settings.heroVideoUrl}
+          src={getMediaUrl(settings.heroVideoUrl, 'video')}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/20 to-white dark:from-black/60 dark:via-black/20 dark:to-black"></div>
       </div>

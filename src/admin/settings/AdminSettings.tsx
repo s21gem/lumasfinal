@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Loader2, Upload, Image as ImageIcon, Globe, Phone, MessageCircle, Calendar, Share2, Type, Layout, Search } from 'lucide-react';
+import { Save, Loader2, Upload, Image as ImageIcon, Globe, Phone, MessageCircle, Calendar, Share2, Type, Layout, Search, Award } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
-type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo';
+type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands';
 
 export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('hero');
@@ -37,6 +38,8 @@ export default function AdminSettings() {
     siteTitle: '',
     siteDescription: '',
     faviconUrl: '',
+    trustedBrandsGrayscale: true,
+    trustedBrandsMarqueeSpeed: 40,
   });
 
   useEffect(() => {
@@ -96,6 +99,12 @@ export default function AdminSettings() {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('folder', 'lumas-portfolio/settings');
+      
+      if (fieldName.includes('logo')) {
+        formData.append('type', 'logo');
+      } else if (fieldName.includes('favicon')) {
+        formData.append('type', 'favicon');
+      }
 
       const res = await fetch('/api/upload', {
         method: 'POST',
@@ -103,11 +112,14 @@ export default function AdminSettings() {
         body: formData,
       });
 
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Upload failed');
+      }
       const data = await res.json();
       setSettings(prev => ({ ...prev, [fieldName]: data.url }));
-    } catch (error) {
-      alert('Upload failed. Make sure Cloudinary is configured.');
+    } catch (error: any) {
+      alert(`Upload failed: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -121,6 +133,7 @@ export default function AdminSettings() {
     { key: 'team', label: 'Team Carousel', icon: <Type className="w-4 h-4" /> },
     { key: 'footer', label: 'Footer', icon: <Globe className="w-4 h-4" /> },
     { key: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
+    { key: 'brands', label: 'Brands', icon: <Award className="w-4 h-4" /> },
   ];
 
   if (loading) {
@@ -207,6 +220,7 @@ export default function AdminSettings() {
               </div>
               <div className="mt-4">
                 <label className={labelClass}>Or Upload Video</label>
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 1920×1080px (16:9) • MP4/WebM • Max 100MB</p>
                 <label className={`flex items-center justify-center gap-3 border-2 border-dashed border-zinc-300 dark:border-zinc-700 rounded-xl p-6 cursor-pointer hover:border-cyan-400 transition-colors ${uploadingVideo ? 'opacity-50' : ''}`}>
                   {uploadingVideo ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5 text-zinc-400" />}
                   <span className="text-zinc-500">{uploadingVideo ? 'Uploading...' : 'Click to upload video (MP4, WebM)'}</span>
@@ -218,7 +232,7 @@ export default function AdminSettings() {
               </div>
               {settings.heroVideoUrl && (
                 <div className="mt-4 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 aspect-video">
-                  <video src={settings.heroVideoUrl} className="w-full h-full object-cover" muted loop autoPlay />
+                  <video src={getMediaUrl(settings.heroVideoUrl, 'video')} className="w-full h-full object-cover" muted loop autoPlay />
                 </div>
               )}
             </div>
@@ -233,9 +247,10 @@ export default function AdminSettings() {
               {/* Light Logo */}
               <div className="space-y-4">
                 <label className={labelClass}>Light Mode Logo</label>
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 400×120px • PNG (transparent bg) • Max 2MB</p>
                 <div className="bg-white border border-zinc-200 rounded-xl p-8 flex items-center justify-center min-h-[120px]">
                   {settings.logoLightUrl ? (
-                    <img src={settings.logoLightUrl} alt="Light Logo" className="max-h-20 object-contain" />
+                    <img src={getMediaUrl(settings.logoLightUrl)} alt="Light Logo" className="max-h-20 object-contain" />
                   ) : (
                     <span className="text-zinc-400">No logo uploaded</span>
                   )}
@@ -253,9 +268,10 @@ export default function AdminSettings() {
               {/* Dark Logo */}
               <div className="space-y-4">
                 <label className={labelClass}>Dark Mode Logo</label>
+                <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 400×120px • PNG (transparent bg) • Max 2MB</p>
                 <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-8 flex items-center justify-center min-h-[120px]">
                   {settings.logoDarkUrl ? (
-                    <img src={settings.logoDarkUrl} alt="Dark Logo" className="max-h-20 object-contain" />
+                    <img src={getMediaUrl(settings.logoDarkUrl)} alt="Dark Logo" className="max-h-20 object-contain" />
                   ) : (
                     <span className="text-zinc-500">No logo uploaded</span>
                   )}
@@ -277,10 +293,11 @@ export default function AdminSettings() {
               <h3 className="text-xl font-bold mb-4">Favicon Management</h3>
               <div className="max-w-md space-y-4">
                 <label className={labelClass}>Site Favicon (32x32 or 64x64 .png/ .ico)</label>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 32×32px or 64×64px (1:1) • PNG/ICO • Max 500KB</p>
                 <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl p-4 flex items-center gap-4 border border-black/5 dark:border-white/5">
                   <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-black/5 shadow-sm overflow-hidden">
                     {settings.faviconUrl ? (
-                      <img src={settings.faviconUrl} alt="Favicon" className="w-8 h-8 object-contain" />
+                      <img src={getMediaUrl(settings.faviconUrl)} alt="Favicon" className="w-8 h-8 object-contain" />
                     ) : (
                       <Globe className="w-6 h-6 text-zinc-300" />
                     )}
@@ -419,6 +436,58 @@ export default function AdminSettings() {
             <div>
               <label className={labelClass}>Meta Description</label>
               <textarea name="siteDescription" value={settings.siteDescription} onChange={handleChange} rows={3} className={inputClass + ' resize-none'} placeholder="Creative Production and Post-production Studio..." />
+            </div>
+          </div>
+        )}
+
+        {/* BRANDS TAB */}
+        {activeTab === 'brands' && (
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold mb-4">Trusted Brands Settings</h3>
+            
+            <div className="bg-zinc-50 dark:bg-zinc-950 border border-black/10 dark:border-white/10 rounded-xl p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-black dark:text-white">Grayscale Brand Logos</h4>
+                  <p className="text-sm text-zinc-500 mt-1">
+                    When enabled, brand logos will be shown in grayscale and only reveal their original colors when hovered. When disabled, logos will always show in full color.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer ml-4">
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={settings.trustedBrandsGrayscale}
+                    onChange={(e) => setSettings(prev => ({ ...prev, trustedBrandsGrayscale: e.target.checked }))}
+                  />
+                  <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-cyan-500"></div>
+                </label>
+              </div>
+
+              <div className="mt-8 border-t border-black/10 dark:border-white/10 pt-8">
+                <div>
+                  <div className="flex justify-between items-center mb-4">
+                    <div>
+                      <h4 className="font-bold text-black dark:text-white">Marquee Scroll Speed</h4>
+                      <p className="text-sm text-zinc-500 mt-1">Control how fast the brands scroll across the screen.</p>
+                    </div>
+                    <span className="text-xl font-black text-cyan-500">{settings.trustedBrandsMarqueeSpeed}s</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="10" 
+                    max="120" 
+                    step="5"
+                    value={settings.trustedBrandsMarqueeSpeed || 40}
+                    onChange={(e) => setSettings(prev => ({ ...prev, trustedBrandsMarqueeSpeed: parseInt(e.target.value) }))}
+                    className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-800 accent-cyan-500"
+                  />
+                  <div className="flex justify-between text-xs text-zinc-500 mt-2 font-medium">
+                    <span>Fast (10s)</span>
+                    <span>Slow (120s)</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

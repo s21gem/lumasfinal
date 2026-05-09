@@ -52,6 +52,12 @@ model Testimonial {
   quote      String
   videoUrl   String?
   imageUrl   String?
+  // Social Media Stats (Optional)
+  ytSubscribers  String?
+  ytViews        String?
+  igFollowers    String?
+  fbFollowers    String?
+  tiktokFollowers String?
   sortOrder  Int      @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -127,6 +133,10 @@ model Settings {
   // SEO
   siteTitle            String?
   siteDescription      String?
+  
+  // Brands
+  trustedBrandsGrayscale Boolean @default(true)
+  trustedBrandsMarqueeSpeed Int @default(40)
 }
 
 model Message {

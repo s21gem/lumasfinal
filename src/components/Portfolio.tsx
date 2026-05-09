@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
+import { getMediaUrl } from '../utils/media';
 
 interface Project {
   id: string;
@@ -94,18 +95,18 @@ export default function Portfolio() {
                   {/* Thumbnail Image */}
                   {item.thumbnailUrl ? (
                     <img 
-                      src={item.thumbnailUrl} 
+                      src={getMediaUrl(item.thumbnailUrl)} 
                       alt={item.title} 
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105 group-focus:scale-105"
                       referrerPolicy="no-referrer"
                     />
-                  ) : item.videoUrl && item.contentType === 'video' ? (
+                  ) : item.videoUrl && item.contentType === 'video' && !item.videoUrl.includes('youtube.com') && !item.videoUrl.includes('youtu.be') && !item.videoUrl.includes('drive.google.com') ? (
                     <video
-                      src={item.videoUrl}
+                      src={getMediaUrl(item.videoUrl, 'video')}
                       className="absolute inset-0 w-full h-full object-cover"
                       muted
                       loop
-                      onMouseEnter={e => (e.target as HTMLVideoElement).play()}
+                      onMouseEnter={e => (e.target as HTMLVideoElement).play().catch(() => {})}
                       onMouseLeave={e => { (e.target as HTMLVideoElement).pause(); (e.target as HTMLVideoElement).currentTime = 0; }}
                     />
                   ) : (

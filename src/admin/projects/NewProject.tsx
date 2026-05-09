@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Upload } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
 export default function NewProject() {
   const { id } = useParams();
@@ -72,11 +73,14 @@ export default function NewProject() {
         headers: { Authorization: `Bearer ${token}` },
         body: fd,
       });
-      if (!res.ok) throw new Error('Upload failed');
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Upload failed');
+      }
       const data = await res.json();
       setFormData(prev => ({ ...prev, [fieldName]: data.url }));
-    } catch {
-      alert('Upload failed. Check Cloudinary configuration.');
+    } catch (error: any) {
+      alert(`Upload failed: ${error.message}`);
     } finally {
       setUploading(false);
     }
@@ -231,6 +235,7 @@ export default function NewProject() {
               <label className="block text-sm font-semibold mb-2 text-zinc-600 dark:text-zinc-400">
                 {formData.contentType === 'video' ? 'Video URL (YouTube/Vimeo/Direct)' : 'Image URL'}
               </label>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 {formData.contentType === 'video' ? 'Video: 1920×1080px (16:9) • MP4/WebM • Max 100MB' : 'Image: 1920×1080px (16:9) • JPG/PNG/WebP • Max 10MB'}</p>
               <input
                 type="url"
                 name="videoUrl"
@@ -252,6 +257,7 @@ export default function NewProject() {
             {/* Thumbnail */}
             <div>
               <label className="block text-sm font-semibold mb-2 text-zinc-600 dark:text-zinc-400">Thumbnail Image</label>
+              <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 1280×720px (16:9) • JPG/PNG/WebP • Max 5MB</p>
               <input
                 type="url"
                 name="thumbnailUrl"
@@ -270,7 +276,7 @@ export default function NewProject() {
               </label>
               {formData.thumbnailUrl && (
                 <div className="mt-3 w-32 h-40 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800">
-                  <img src={formData.thumbnailUrl} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                  <img src={getMediaUrl(formData.thumbnailUrl)} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                 </div>
               )}
             </div>

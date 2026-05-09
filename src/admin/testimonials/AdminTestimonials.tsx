@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Quote, Loader2 } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
 interface Testimonial {
   id: string;
@@ -85,7 +86,7 @@ export default function AdminTestimonials() {
               <p className="text-zinc-700 dark:text-zinc-300 mb-4 line-clamp-3">"{t.quote}"</p>
               <div className="flex items-center gap-3">
                 {t.imageUrl ? (
-                  <img src={t.imageUrl} alt={t.clientName} className="w-10 h-10 rounded-full object-cover" referrerPolicy="no-referrer" />
+                  <img src={getMediaUrl(t.imageUrl)} alt={t.clientName} className="w-10 h-10 rounded-full object-cover" referrerPolicy="no-referrer" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-500 font-bold text-sm">
                     {t.clientName.charAt(0)}

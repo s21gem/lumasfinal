@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Edit2, Trash2, Video } from 'lucide-react';
+import { Plus, Edit2, Trash2, Video, Image as ImageIcon } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
 interface Project {
   id: string;
   title: string;
   category: string;
   clientName: string;
+  thumbnailUrl: string | null;
   createdAt: string;
 }
 
@@ -79,6 +81,7 @@ export default function AdminProjects() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-black/5 dark:border-white/5 bg-zinc-50 dark:bg-zinc-950/50">
+                <th className="px-6 py-4 font-semibold text-zinc-500">Thumbnail</th>
                 <th className="px-6 py-4 font-semibold text-zinc-500">Title</th>
                 <th className="px-6 py-4 font-semibold text-zinc-500">Category</th>
                 <th className="px-6 py-4 font-semibold text-zinc-500">Client</th>
@@ -89,6 +92,15 @@ export default function AdminProjects() {
             <tbody>
               {projects.map((project) => (
                 <tr key={project.id} className="border-b border-black/5 dark:border-white/5 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="w-12 h-16 rounded-lg bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex items-center justify-center border border-black/5 dark:border-white/5">
+                      {project.thumbnailUrl ? (
+                        <img src={getMediaUrl(project.thumbnailUrl)} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon className="w-5 h-5 text-zinc-400" />
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4 font-bold">{project.title}</td>
                   <td className="px-6 py-4">
                     <span className="bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-full text-sm font-medium">

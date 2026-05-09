@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Edit2, Trash2, Loader2, Image as ImageIcon, Users, Settings2 } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
 interface TeamMember {
   id: string;
@@ -159,7 +160,7 @@ export default function AdminTeam() {
             <div className="aspect-square bg-zinc-100 dark:bg-zinc-800 relative">
               {member.imageUrl ? (
                 <img
-                  src={member.imageUrl}
+                  src={getMediaUrl(member.imageUrl)}
                   alt={member.name}
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"

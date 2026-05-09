@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { getMediaUrl } from '../utils/media';
 
 interface TeamMember {
   id: string;
@@ -12,6 +13,7 @@ export default function Team() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [carouselDistance, setCarouselDistance] = useState(380);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +69,16 @@ export default function Team() {
           --tz: ${carouselDistance}px;
         }
       `}</style>
+      <style>{`
+        .carousel-card {
+          transition: z-index 0s, transform 0.4s ease, filter 0.5s ease;
+        }
+        .carousel-card:hover {
+          z-index: 100 !important;
+          transform: rotateY(var(--card-angle)) translateZ(var(--tz)) translateY(var(--card-y)) rotateZ(0deg) scale(1.15) !important;
+          filter: grayscale(0) !important;
+        }
+      `}</style>
 
       {/* Massive Background Text with Parallax */}
       <motion.div
@@ -112,7 +124,7 @@ export default function Team() {
                 >
                   {member.imageUrl ? (
                     <img
-                      src={member.imageUrl}
+                      src={getMediaUrl(member.imageUrl)}
                       alt={member.name}
                       className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0 transition-all duration-500"
                       referrerPolicy="no-referrer"
@@ -134,7 +146,11 @@ export default function Team() {
           </div>
 
           {/* Desktop View: 3D Merry-Go-Round Carousel */}
-          <div className="relative z-10 w-full h-[500px] perspective-container hidden md:flex items-center justify-center mt-32">
+          <div 
+            className="relative z-10 w-full h-[500px] perspective-container hidden md:flex items-center justify-center mt-32"
+            onMouseEnter={() => setIsCarouselHovered(true)}
+            onMouseLeave={() => setIsCarouselHovered(false)}
+          >
             <motion.div
               style={{ y: carouselY, rotateX: -8 }}
               className="relative w-full h-full flex items-center justify-center preserve-3d"
@@ -144,6 +160,7 @@ export default function Team() {
                 animate={{ rotateY: [0, -360] }}
                 transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
                 className="relative w-52 h-64 preserve-3d"
+                style={{ animationPlayState: isCarouselHovered ? 'paused' : 'running' }}
               >
                 {teamMembers.map((member, index) => {
                   const angle = (index / teamMembers.length) * 360;
@@ -156,13 +173,15 @@ export default function Team() {
                       tabIndex={0}
                       className="absolute inset-0 rounded-3xl overflow-hidden border-2 border-black/10 dark:border-white/10 bg-zinc-100 dark:bg-zinc-900 carousel-card group shadow-2xl focus:outline-none cursor-pointer"
                       style={{
+                        '--card-angle': `${angle}deg`,
+                        '--card-y': `${yOffset}px`,
                         transform: `rotateY(${angle}deg) translateZ(var(--tz)) translateY(${yOffset}px) rotateZ(${rotation}deg)`,
                         backfaceVisibility: 'visible',
-                      }}
+                      } as React.CSSProperties}
                     >
                       {member.imageUrl ? (
                         <img
-                          src={member.imageUrl}
+                          src={getMediaUrl(member.imageUrl)}
                           alt={member.name}
                           className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0 transition-all duration-500"
                           referrerPolicy="no-referrer"

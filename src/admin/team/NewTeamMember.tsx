@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Image as ImageIcon } from 'lucide-react';
+import { getMediaUrl } from '../../utils/media';
 
 export default function NewTeamMember() {
   const navigate = useNavigate();
@@ -166,7 +167,7 @@ export default function NewTeamMember() {
               <div className="w-24 h-24 shrink-0 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-black/5 dark:border-white/5 overflow-hidden flex items-center justify-center">
                 {formData.imageUrl ? (
                   <img
-                    src={formData.imageUrl}
+                    src={getMediaUrl(formData.imageUrl)}
                     alt="Preview"
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"

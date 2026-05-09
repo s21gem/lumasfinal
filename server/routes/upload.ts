@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB max
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB max
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
       "image/jpeg",
@@ -54,11 +54,13 @@ router.post("/", requireAuth, upload.single("file"), async (req, res) => {
     const isVideo = req.file.mimetype.startsWith("video/");
     const resourceType = isVideo ? "video" : "image";
     const folder = (req.body.folder as string) || "lumas-portfolio";
+    const uploadType = req.body.type as string;
 
     const result = await uploadToCloudinary(
       req.file.path,
       folder,
-      resourceType
+      resourceType,
+      uploadType
     );
 
     // Clean up temporary file

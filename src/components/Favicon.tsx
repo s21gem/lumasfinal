@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getMediaUrl } from '../utils/media';
 
 export default function Favicon() {
   useEffect(() => {
@@ -14,7 +15,7 @@ export default function Favicon() {
               link.rel = 'icon';
               document.getElementsByTagName('head')[0].appendChild(link);
             }
-            link.href = settings.faviconUrl;
+            link.href = getMediaUrl(settings.faviconUrl);
           }
         }
       } catch (error) {

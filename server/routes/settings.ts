@@ -29,6 +29,8 @@ router.get("/", async (req, res) => {
           copyrightText: "Lumas Creative Studio",
           siteTitle: "Lumas Creative Studio",
           siteDescription: "Creative Production and Post-production Studio",
+          trustedBrandsGrayscale: true,
+          trustedBrandsMarqueeSpeed: 40,
         },
       });
     }
@@ -75,6 +77,9 @@ router.put("/", requireAuth, async (req, res) => {
       siteTitle,
       siteDescription,
       faviconUrl,
+      // Brands
+      trustedBrandsGrayscale,
+      trustedBrandsMarqueeSpeed,
     } = req.body;
 
     const updateData: any = {};
@@ -104,6 +109,7 @@ router.put("/", requireAuth, async (req, res) => {
     if (copyrightText !== undefined) updateData.copyrightText = copyrightText;
     if (siteTitle !== undefined) updateData.siteTitle = siteTitle;
     if (siteDescription !== undefined) updateData.siteDescription = siteDescription;
+    if (trustedBrandsGrayscale !== undefined) updateData.trustedBrandsGrayscale = trustedBrandsGrayscale;
 
     const settings = await prisma.settings.upsert({
       where: { id: "global" },

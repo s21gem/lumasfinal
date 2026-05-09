@@ -64,14 +64,14 @@ router.get("/:id", async (req, res) => {
 // POST new testimonial (Protected)
 router.post("/", requireAuth, async (req, res) => {
   try {
-    const { clientName, role, company, quote, videoUrl, imageUrl } = req.body;
+    const { clientName, role, company, quote, videoUrl, imageUrl, ytSubscribers, ytViews, igFollowers, fbFollowers, tiktokFollowers } = req.body;
     if (!clientName || !quote) {
       return res.status(400).json({ error: "Client name and quote are required" });
     }
 
     const count = await prisma.testimonial.count();
     const testimonial = await prisma.testimonial.create({
-      data: { clientName, role, company, quote, videoUrl, imageUrl, sortOrder: count },
+      data: { clientName, role, company, quote, videoUrl, imageUrl, ytSubscribers, ytViews, igFollowers, fbFollowers, tiktokFollowers, sortOrder: count },
     });
     res.status(201).json(testimonial);
   } catch (error) {
@@ -83,10 +83,10 @@ router.post("/", requireAuth, async (req, res) => {
 // PUT update testimonial (Protected)
 router.put("/:id", requireAuth, async (req, res) => {
   try {
-    const { clientName, role, company, quote, videoUrl, imageUrl, sortOrder } = req.body;
+    const { clientName, role, company, quote, videoUrl, imageUrl, sortOrder, ytSubscribers, ytViews, igFollowers, fbFollowers, tiktokFollowers } = req.body;
     const testimonial = await prisma.testimonial.update({
       where: { id: req.params.id },
-      data: { clientName, role, company, quote, videoUrl, imageUrl, sortOrder },
+      data: { clientName, role, company, quote, videoUrl, imageUrl, sortOrder, ytSubscribers, ytViews, igFollowers, fbFollowers, tiktokFollowers },
     });
     res.json(testimonial);
   } catch (error) {
