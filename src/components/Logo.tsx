@@ -44,7 +44,7 @@ export default function Logo({ className = "h-8 w-auto" }: { className?: string 
     <div className={`flex items-center justify-center ${className} min-w-[100px]`}>
       {!imgError && currentLogo ? (
         <img 
-          src={getMediaUrl(currentLogo)} 
+          src={getMediaUrl(currentLogo, 'logo')} 
           alt="Logo" 
           className="h-full w-auto object-contain"
           onError={() => setImgError(true)}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Calendar, Clock, User, Phone, Mail, CheckCircle, XCircle, Trash2, Edit, MessageCircle, Send } from 'lucide-react';
+import socket from '../../utils/socket';
 
 interface Appointment {
   id: string;
@@ -48,6 +49,22 @@ export default function AdminAppointments() {
 
   useEffect(() => {
     fetchAppointments();
+
+    socket.on('new_appointment', (newApt: Appointment) => {
+      setAppointments(prev => [newApt, ...prev]);
+      if (Notification.permission === "granted") {
+        new Notification("New Appointment from " + newApt.clientName);
+      }
+    });
+
+    socket.on('appointment_updated', (updatedApt: Appointment) => {
+      setAppointments(prev => prev.map(a => a.id === updatedApt.id ? updatedApt : a));
+    });
+
+    return () => {
+      socket.off('new_appointment');
+      socket.off('appointment_updated');
+    };
   }, []);
 
   const fetchAppointments = async () => {

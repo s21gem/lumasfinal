@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, Trash2, CheckCircle, Clock } from 'lucide-react';
+import socket from '../../utils/socket';
 
 interface Message {
   id: string;
@@ -35,6 +36,19 @@ export default function AdminMessages() {
 
   useEffect(() => {
     fetchMessages();
+
+    socket.on('new_message', (newMessage: Message) => {
+      setMessages(prev => [newMessage, ...prev]);
+      
+      // Optional: Play sound or show browser notification
+      if (Notification.permission === "granted") {
+        new Notification("New Message from " + newMessage.name);
+      }
+    });
+
+    return () => {
+      socket.off('new_message');
+    };
   }, []);
 
   const markAsRead = async (id: string, isRead: boolean) => {

@@ -51,6 +51,24 @@ router.post("/", requireAuth, async (req, res) => {
 
 // PUT update service (Protected)
 router.put("/:id", requireAuth, async (req, res) => {
+  if (req.params.id === "reorder") {
+    try {
+      const { items } = req.body;
+      await prisma.$transaction(
+        items.map((item: any) =>
+          prisma.service.update({
+            where: { id: item.id },
+            data: { sortOrder: item.sortOrder },
+          })
+        )
+      );
+      return res.json({ message: "Services reordered" });
+    } catch (error) {
+      console.error("Error reordering services:", error);
+      return res.status(500).json({ error: "Failed to reorder services" });
+    }
+  }
+
   try {
     const { title, description, iconIdentifier, sortOrder } = req.body;
     const service = await prisma.service.update({

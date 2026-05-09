@@ -2,6 +2,7 @@ import { Router } from "express";
 import { prisma } from "../db";
 import { requireAuth } from "../middleware/auth";
 import { sendWhatsAppNotification } from "../utils/whatsapp";
+import { emitEvent } from "../socket";
 // Assume you have sendEmail from earlier
 // import { sendEmail } from "../utils/email"; 
 
@@ -53,6 +54,9 @@ router.post("/", async (req, res) => {
     }
 
     res.status(201).json({ message: "Booking submitted successfully", appointment });
+    
+    // Emit Realtime Update
+    emitEvent("new_appointment", appointment);
   } catch (error) {
     console.error("Booking Error:", error);
     res.status(500).json({ error: "Failed to submit booking" });
@@ -89,8 +93,8 @@ router.put("/:id/status", requireAuth, async (req, res) => {
       data: { status }
     });
 
-    // TODO: Send Email Notification to client about status update (using Nodemailer)
-    // if (status === 'APPROVED') { sendEmail(appointment.clientEmail, ...) }
+    // Emit Realtime Update
+    emitEvent("appointment_updated", appointment);
 
     res.json(appointment);
   } catch (error) {

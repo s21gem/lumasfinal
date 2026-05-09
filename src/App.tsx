@@ -11,7 +11,7 @@ import Testimonials from './components/Testimonials';
 import Booking from './components/Booking';
 import Footer from './components/Footer';
 import { ThemeProvider } from './components/ThemeContext';
-import Favicon from './components/Favicon';
+import SEO from './components/SEO';
 
 // Admin Pages
 import AdminLogin from './admin/AdminLogin';
@@ -54,7 +54,7 @@ function HomePage() {
 function App() {
   return (
     <ThemeProvider>
-      <Favicon />
+      <SEO />
       <Router>
         <Routes>
           {/* Public Routes */}

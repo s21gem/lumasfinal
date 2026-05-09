@@ -1,6 +1,8 @@
 import express from "express";
+import { createServer } from "http";
 import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+import { initSocket } from "./server/socket";
 
 // Load environment variables before importing routes
 dotenv.config();
@@ -60,7 +62,10 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  const httpServer = createServer(app);
+  initSocket(httpServer);
+
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://localhost:${PORT}`);
   });
 }

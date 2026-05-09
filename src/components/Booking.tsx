@@ -154,11 +154,11 @@ export default function Booking() {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <section id="contact" className="py-32 bg-white dark:bg-black border-t border-black/5 dark:border-white/5 relative overflow-hidden">
+    <section id="contact" className="py-16 md:py-32 bg-white dark:bg-black border-t border-black/5 dark:border-white/5 relative overflow-hidden !px-0">
       <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-400/5 blur-[200px] rounded-full pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           
           {/* Left Side: Booking System */}
           <motion.div

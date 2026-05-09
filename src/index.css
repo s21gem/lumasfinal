@@ -53,3 +53,24 @@ h1, h2, h3, h4, h5, h6, .font-black, .font-bold {
   animation: border-beam 4s linear infinite;
   z-index: -1;
 }
+
+/* Mobile Responsive Utilities */
+@layer base {
+  section {
+    @apply py-16 md:py-32 px-6;
+  }
+}
+
+@media (max-width: 640px) {
+  h1 {
+    @apply text-4xl !important;
+    line-height: 1.1 !important;
+  }
+  h2 {
+    @apply text-3xl !important;
+    line-height: 1.1 !important;
+  }
+  .max-w-7xl {
+    @apply px-4 !important;
+  }
+}

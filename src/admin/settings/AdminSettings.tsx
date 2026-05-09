@@ -268,7 +268,7 @@ export default function AdminSettings() {
                 <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 400×120px • PNG (transparent bg) • Max 2MB</p>
                 <div className="bg-white border border-zinc-200 rounded-xl p-8 flex items-center justify-center min-h-[120px]">
                   {settings.logoLightUrl ? (
-                    <img src={getMediaUrl(settings.logoLightUrl)} alt="Light Logo" className="max-h-20 object-contain" />
+                    <img src={getMediaUrl(settings.logoLightUrl, 'logo')} alt="Light Logo" className="max-h-20 object-contain" />
                   ) : (
                     <span className="text-zinc-400">No logo uploaded</span>
                   )}
@@ -289,7 +289,7 @@ export default function AdminSettings() {
                 <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 400×120px • PNG (transparent bg) • Max 2MB</p>
                 <div className="bg-zinc-900 border border-zinc-700 rounded-xl p-8 flex items-center justify-center min-h-[120px]">
                   {settings.logoDarkUrl ? (
-                    <img src={getMediaUrl(settings.logoDarkUrl)} alt="Dark Logo" className="max-h-20 object-contain" />
+                    <img src={getMediaUrl(settings.logoDarkUrl, 'logo')} alt="Dark Logo" className="max-h-20 object-contain" />
                   ) : (
                     <span className="text-zinc-500">No logo uploaded</span>
                   )}
@@ -315,7 +315,7 @@ export default function AdminSettings() {
                 <div className="bg-zinc-100 dark:bg-zinc-800 rounded-xl p-4 flex items-center gap-4 border border-black/5 dark:border-white/5">
                   <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center border border-black/5 shadow-sm overflow-hidden">
                     {settings.faviconUrl ? (
-                      <img src={getMediaUrl(settings.faviconUrl)} alt="Favicon" className="w-8 h-8 object-contain" />
+                      <img src={getMediaUrl(settings.faviconUrl, 'favicon')} alt="Favicon" className="w-8 h-8 object-contain" />
                     ) : (
                       <Globe className="w-6 h-6 text-zinc-300" />
                     )}

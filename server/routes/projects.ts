@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { sortOrder: "asc" },
     });
     res.json(projects);
   } catch (error) {
@@ -22,7 +22,7 @@ router.get("/category/:category", async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
       where: { category: req.params.category },
-      orderBy: { createdAt: "desc" },
+      orderBy: { sortOrder: "asc" },
     });
     res.json(projects);
   } catch (error) {
@@ -53,6 +53,8 @@ router.post("/", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Title and category are required" });
     }
 
+    const count = await prisma.project.count();
+
     const project = await prisma.project.create({
       data: {
         title,
@@ -63,6 +65,7 @@ router.post("/", requireAuth, async (req, res) => {
         shortDescription,
         results,
         contentType: contentType || "video",
+        sortOrder: count,
       },
     });
     
@@ -75,8 +78,26 @@ router.post("/", requireAuth, async (req, res) => {
 
 // PUT update project (Protected)
 router.put("/:id", requireAuth, async (req, res) => {
+  if (req.params.id === "reorder") {
+    try {
+      const { items } = req.body;
+      await prisma.$transaction(
+        items.map((item: any) =>
+          prisma.project.update({
+            where: { id: item.id },
+            data: { sortOrder: item.sortOrder },
+          })
+        )
+      );
+      return res.json({ message: "Projects reordered" });
+    } catch (error) {
+      console.error("Error reordering projects:", error);
+      return res.status(500).json({ error: "Failed to reorder projects" });
+    }
+  }
+
   try {
-    const { title, category, videoUrl, thumbnailUrl, clientName, shortDescription, results, contentType } = req.body;
+    const { title, category, videoUrl, thumbnailUrl, clientName, shortDescription, results, contentType, sortOrder } = req.body;
     
     const project = await prisma.project.update({
       where: { id: req.params.id },
@@ -89,6 +110,7 @@ router.put("/:id", requireAuth, async (req, res) => {
         shortDescription,
         results,
         contentType,
+        sortOrder,
       },
     });
     

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import nodemailer from "nodemailer";
 import { prisma } from "../db";
+import { emitEvent } from "../socket";
 
 const router = Router();
 
@@ -14,13 +15,16 @@ router.post("/", async (req, res) => {
     }
 
     // 1. Save to Database
-    await prisma.message.create({
+    const newMessage = await prisma.message.create({
       data: {
         name,
         email,
         message,
       },
     });
+
+    // 2. Emit Realtime Update
+    emitEvent("new_message", newMessage);
 
     // Check if SMTP is configured
     if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {

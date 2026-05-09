@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FolderKanban, Users, MessageSquare, LogOut, Settings, Zap, GitBranch, Award, Menu, X, Mail, Calendar, Clock } from 'lucide-react';
+import Logo from '../components/Logo';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -18,6 +19,13 @@ export default function AdminLayout() {
   useEffect(() => {
     setSidebarOpen(false);
   }, [location.pathname]);
+
+  // Request notification permissions
+  useEffect(() => {
+    if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -48,7 +56,10 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-zinc-900 border-r border-black/5 dark:border-white/5 flex flex-col transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between">
-          <Link to="/admin" className="text-2xl font-black tracking-tighter">LUMAS Admin</Link>
+          <Link to="/admin" className="flex flex-col">
+            <Logo className="h-7 w-auto" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400 mt-1">Admin Panel</span>
+          </Link>
           <button className="lg:hidden p-1" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
           </button>
@@ -98,11 +109,16 @@ export default function AdminLayout() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Mobile Header */}
-        <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-zinc-900 border-b border-black/5 dark:border-white/5 px-4 py-3 flex items-center gap-3">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg">
-            <Menu className="w-5 h-5" />
-          </button>
-          <span className="font-bold">LUMAS Admin</span>
+        <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-zinc-900 border-b border-black/5 dark:border-white/5 px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => setSidebarOpen(true)} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg">
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="flex flex-col">
+              <Logo className="h-5 w-auto" />
+              <span className="text-[8px] font-bold uppercase tracking-widest text-zinc-400">Admin Panel</span>
+            </div>
+          </div>
         </div>
         <div className="p-4 md:p-8 max-w-6xl mx-auto">
           <Outlet />
