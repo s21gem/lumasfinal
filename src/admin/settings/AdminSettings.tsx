@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Upload, Image as ImageIcon, Globe, Phone, MessageCircle, Calendar, Share2, Type, Layout, Search, Award } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
 
-type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands';
+type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands' | 'policies' | 'account';
 
 export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('hero');
@@ -12,7 +12,14 @@ export default function AdminSettings() {
   const [uploadingDark, setUploadingDark] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const [accountData, setAccountData] = useState({
+    newEmail: '',
+    newPassword: '',
+    otp: ''
+  });
   const [settings, setSettings] = useState({
     heroSubtitle: '',
     heroTitle: '',
@@ -40,6 +47,8 @@ export default function AdminSettings() {
     faviconUrl: '',
     trustedBrandsGrayscale: true,
     trustedBrandsMarqueeSpeed: 40,
+    privacyPolicy: '',
+    termsOfService: '',
   });
 
   useEffect(() => {
@@ -134,6 +143,8 @@ export default function AdminSettings() {
     { key: 'footer', label: 'Footer', icon: <Globe className="w-4 h-4" /> },
     { key: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
     { key: 'brands', label: 'Brands', icon: <Award className="w-4 h-4" /> },
+    { key: 'policies', label: 'Policies', icon: <Globe className="w-4 h-4" /> },
+    { key: 'account', label: 'Account', icon: <Phone className="w-4 h-4" /> },
   ];
 
   if (loading) {
@@ -487,6 +498,112 @@ export default function AdminSettings() {
                     <span>Slow (120s)</span>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* POLICIES TAB */}
+        {activeTab === 'policies' && (
+          <div className="space-y-6">
+            <h3 className="text-xl font-bold mb-4">Legal Policies</h3>
+            <div className="grid grid-cols-1 gap-8">
+              <div>
+                <label className={labelClass}>Privacy Policy</label>
+                <textarea 
+                  name="privacyPolicy" 
+                  value={settings.privacyPolicy} 
+                  onChange={handleChange} 
+                  rows={10} 
+                  className={inputClass + ' resize-none font-mono text-xs'} 
+                  placeholder="Enter privacy policy content (HTML or plain text)..." 
+                />
+                <p className="text-xs text-zinc-500 mt-2">You can use plain text or basic HTML tags for formatting.</p>
+              </div>
+              <div>
+                <label className={labelClass}>Terms of Service</label>
+                <textarea 
+                  name="termsOfService" 
+                  value={settings.termsOfService} 
+                  onChange={handleChange} 
+                  rows={10} 
+                  className={inputClass + ' resize-none font-mono text-xs'} 
+                  placeholder="Enter terms of service content (HTML or plain text)..." 
+                />
+                <p className="text-xs text-zinc-500 mt-2">You can use plain text or basic HTML tags for formatting.</p>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* ACCOUNT TAB */}
+        {activeTab === 'account' && (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-bold">Admin Account Settings</h3>
+              <p className="text-sm text-zinc-500 mt-1">Change your login email and password. This action requires email verification.</p>
+            </div>
+
+            <div className="max-w-md space-y-6">
+              <div>
+                <label className={labelClass}>New Email (Leave blank to keep current)</label>
+                <input 
+                  type="email" 
+                  value={accountData.newEmail} 
+                  onChange={(e) => setAccountData(p => ({...p, newEmail: e.target.value}))} 
+                  className={inputClass} 
+                  placeholder="new-admin@example.com" 
+                />
+              </div>
+              <div>
+                <label className={labelClass}>New Password (Leave blank to keep current)</label>
+                <input 
+                  type="password" 
+                  value={accountData.newPassword} 
+                  onChange={(e) => setAccountData(p => ({...p, newPassword: e.target.value}))} 
+                  className={inputClass} 
+                  placeholder="••••••••" 
+                />
+              </div>
+
+              <div className="pt-4 border-t border-black/5 dark:border-white/5">
+                <button
+                  onClick={async () => {
+                    setSaving(true);
+                    try {
+                      const token = localStorage.getItem('adminToken');
+                      const res = await fetch('/api/auth/update-credentials', {
+                        method: 'PUT',
+                        headers: { 
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}` 
+                        },
+                        body: JSON.stringify({
+                          newEmail: accountData.newEmail,
+                          newPassword: accountData.newPassword
+                        })
+                      });
+                      if (res.ok) {
+                        setSuccessMsg('Account updated! Please log in again.');
+                        setTimeout(() => {
+                          localStorage.removeItem('adminToken');
+                          window.location.href = '/admin/login';
+                        }, 2000);
+                      } else {
+                        const d = await res.json();
+                        alert(d.error || 'Failed to update');
+                      }
+                    } catch (e) {
+                      alert('Error updating credentials');
+                    } finally {
+                      setSaving(false);
+                    }
+                  }}
+                  disabled={saving || (!accountData.newEmail && !accountData.newPassword)}
+                  className="w-full flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                  Update Admin Account
+                </button>
               </div>
             </div>
           </div>

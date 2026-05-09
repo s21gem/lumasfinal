@@ -13,6 +13,8 @@ interface FooterSettings {
   twitterUrl: string;
   linkedinUrl: string;
   youtubeUrl: string;
+  privacyPolicy: string;
+  termsOfService: string;
 }
 
 interface ServiceItem {
@@ -27,6 +29,7 @@ export default function Footer() {
     copyrightText: 'Lumas Creative Studio',
     phone: '', email: '', address: '123 Creative Blvd, Suite 400', city: 'Los Angeles, CA 90015',
     instagramUrl: '', twitterUrl: '', linkedinUrl: '', youtubeUrl: '',
+    privacyPolicy: '', termsOfService: '',
   });
   const [services, setServices] = useState<ServiceItem[]>([]);
 
@@ -43,6 +46,8 @@ export default function Footer() {
         twitterUrl: data.twitterUrl || '',
         linkedinUrl: data.linkedinUrl || '',
         youtubeUrl: data.youtubeUrl || '',
+        privacyPolicy: data.privacyPolicy || '',
+        termsOfService: data.termsOfService || '',
       }));
     }).catch(console.error);
 
@@ -55,6 +60,22 @@ export default function Footer() {
     { url: settings.linkedinUrl, icon: Linkedin },
     { url: settings.youtubeUrl, icon: Youtube },
   ].filter(s => s.url);
+  
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState('');
+  const [modalContent, setModalContent] = useState('');
+
+  const openPolicy = (title: string, content: string) => {
+    setModalTitle(title);
+    setModalContent(content || 'Content not yet provided.');
+    setModalOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closePolicy = () => {
+    setModalOpen(false);
+    document.body.style.overflow = 'unset';
+  };
 
   return (
     <footer className="bg-white dark:bg-black py-16 border-t border-black/10 dark:border-white/10">
@@ -123,11 +144,56 @@ export default function Footer() {
             &copy; {currentYear} {settings.copyrightText}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors">Privacy Policy</a>
-            <a href="#" className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors">Terms of Service</a>
+            <button 
+              onClick={() => openPolicy('Privacy Policy', settings.privacyPolicy)}
+              className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors cursor-pointer"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              onClick={() => openPolicy('Terms of Service', settings.termsOfService)}
+              className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors cursor-pointer"
+            >
+              Terms of Service
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Policy Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10">
+          <div 
+            className="absolute inset-0 bg-black/40 backdrop-blur-md"
+            onClick={closePolicy}
+          />
+          <div className="relative w-full max-w-4xl max-h-[80vh] bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl rounded-3xl border border-white/20 dark:border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.3)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div className="p-6 md:p-8 border-b border-black/5 dark:border-white/10 flex items-center justify-between">
+              <h2 className="text-2xl md:text-3xl font-black text-black dark:text-white tracking-tighter">{modalTitle}</h2>
+              <button 
+                onClick={closePolicy}
+                className="w-10 h-10 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 md:p-10">
+              <div 
+                className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-sm md:text-base leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: modalContent.replace(/\n/g, '<br />') }}
+              />
+            </div>
+            <div className="p-6 border-t border-black/5 dark:border-white/10 flex justify-end">
+              <button 
+                onClick={closePolicy}
+                className="bg-black dark:bg-white text-white dark:text-black px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </footer>
   );
 }

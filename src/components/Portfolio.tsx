@@ -119,7 +119,7 @@ export default function Portfolio() {
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/70 group-active:bg-black/70 group-focus:bg-black/70 transition-colors duration-500 z-10" />
 
                   {/* Content Overlay */}
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end z-20 opacity-0 group-hover:opacity-100 group-active:opacity-100 group-focus:opacity-100 transition-opacity duration-500 translate-y-4 group-hover:translate-y-0 group-active:translate-y-0 group-focus:translate-y-0">
+                  <div className="absolute inset-0 p-8 flex flex-col justify-end z-20 opacity-100 translate-y-0 md:opacity-0 md:group-hover:opacity-100 md:translate-y-4 md:group-hover:translate-y-0 transition-all duration-500">
                     {item.clientName && (
                       <span className="text-cyan-400 text-sm font-bold tracking-wider uppercase mb-2">
                         {item.clientName}

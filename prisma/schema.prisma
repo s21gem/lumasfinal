@@ -137,6 +137,10 @@ model Settings {
   // Brands
   trustedBrandsGrayscale Boolean @default(true)
   trustedBrandsMarqueeSpeed Int @default(40)
+  
+  // Policies
+  privacyPolicy        String?
+  termsOfService       String?
 }
 
 model Message {

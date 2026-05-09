@@ -80,6 +80,9 @@ router.put("/", requireAuth, async (req, res) => {
       // Brands
       trustedBrandsGrayscale,
       trustedBrandsMarqueeSpeed,
+      // Policies
+      privacyPolicy,
+      termsOfService,
     } = req.body;
 
     const updateData: any = {};
@@ -110,6 +113,9 @@ router.put("/", requireAuth, async (req, res) => {
     if (siteTitle !== undefined) updateData.siteTitle = siteTitle;
     if (siteDescription !== undefined) updateData.siteDescription = siteDescription;
     if (trustedBrandsGrayscale !== undefined) updateData.trustedBrandsGrayscale = trustedBrandsGrayscale;
+    if (trustedBrandsMarqueeSpeed !== undefined) updateData.trustedBrandsMarqueeSpeed = trustedBrandsMarqueeSpeed;
+    if (privacyPolicy !== undefined) updateData.privacyPolicy = privacyPolicy;
+    if (termsOfService !== undefined) updateData.termsOfService = termsOfService;
 
     const settings = await prisma.settings.upsert({
       where: { id: "global" },

@@ -83,10 +83,10 @@ export default function Team() {
       {/* Massive Background Text with Parallax */}
       <motion.div
         style={{ y: textY }}
-        className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+        className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden"
       >
-        <h2 className="text-[35vw] md:text-[30vw] font-black text-black/5 dark:text-white/10 leading-[0.75] tracking-tighter text-center lowercase select-none">
-          big <br /> results
+        <h2 className="text-[40vw] md:text-[30vw] font-black text-black/5 dark:text-white/10 leading-[0.75] tracking-tighter text-center lowercase select-none whitespace-nowrap">
+          big results
         </h2>
       </motion.div>
 

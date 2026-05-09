@@ -348,6 +348,7 @@ export default function PortfolioCategoryPage() {
 
   useEffect(() => {
     if (category) {
+      window.scrollTo(0, 0);
       fetch(`/api/projects/category/${encodeURIComponent(decodedCategory)}`)
         .then(r => r.json())
         .then(setProjects)
@@ -385,7 +386,7 @@ export default function PortfolioCategoryPage() {
   const row2Projects = projects.filter((_, i) => i % 2 === 1);
 
   return (
-    <div className="h-screen bg-zinc-50 dark:bg-zinc-950 text-black dark:text-white flex flex-col overflow-hidden relative">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-black dark:text-white flex flex-col relative">
       {/* Header with significantly reduced size */}
       <div className="pt-20 pb-4 px-6 bg-zinc-50 dark:bg-zinc-950 border-b border-black/5 dark:border-white/5 flex-shrink-0 z-10 shadow-sm relative">
         <div className="max-w-[1800px] mx-auto flex flex-row justify-between items-end gap-4 relative z-10">
@@ -408,28 +409,20 @@ export default function PortfolioCategoryPage() {
 
       <div className="flex-grow flex relative w-full h-full max-w-[1800px] mx-auto overflow-hidden">
         
-        {/* Mobile View: Vertical Single Column */}
-        <div className="md:hidden w-full h-full px-6 pt-4 pb-12 relative">
-          <InfiniteColumn ref={colRef} projects={projects} direction="up" speed={1.5} onPlay={(p) => setActiveVideo(p)} />
-          
-          <div className="absolute right-6 bottom-4 flex flex-col gap-3 z-20">
-            <button 
-              onClick={() => handleManualColNav(400)}
-              className="w-10 h-10 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-black/5 dark:border-white/5 shadow-xl flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <ChevronUp className="w-4 h-4 text-black dark:text-white" />
-            </button>
-            <button 
-              onClick={() => handleManualColNav(-400)}
-              className="w-10 h-10 rounded-full bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border border-black/5 dark:border-white/5 shadow-xl flex items-center justify-center active:scale-95 transition-transform"
-            >
-              <ChevronDown className="w-4 h-4 text-black dark:text-white" />
-            </button>
-          </div>
+        {/* Mobile View: Vertical List with minimum length for scrolling depth */}
+        <div className="md:hidden w-full px-6 pt-10 pb-32 flex flex-col gap-8">
+          {(projects.length < 5 
+            ? [...projects, ...projects, ...projects, ...projects, ...projects].slice(0, Math.max(5, projects.length))
+            : projects
+          ).map((project, index) => (
+            <div key={`${project.id}-${index}`} className="w-full">
+              <ProjectCard project={project} isRow={false} onPlay={() => setActiveVideo(project)} />
+            </div>
+          ))}
         </div>
 
         {/* Desktop View: Single Horizontal Row */}
-        <div className="hidden md:flex items-center justify-center h-full w-full overflow-hidden">
+        <div className="hidden md:flex items-center justify-center h-[70vh] w-full overflow-hidden my-12">
           <InfiniteRow ref={row1Ref} projects={projects} direction="left" speed={1.5} onPlay={(p) => setActiveVideo(p)} />
         </div>
       </div>

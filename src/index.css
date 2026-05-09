@@ -8,6 +8,48 @@
   --font-heading: "Outfit", ui-sans-serif, system-ui, sans-serif;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  scroll-behavior: smooth;
+}
+
+#root {
+  width: 100%;
+  overflow-x: hidden;
+}
+
 h1, h2, h3, h4, h5, h6, .font-black, .font-bold {
   font-family: var(--font-heading);
+}
+
+@keyframes border-beam {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.border-beam-container {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.border-beam-container::before {
+  content: "";
+  position: absolute;
+  inset: -200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    transparent 280deg,
+    #22d3ee 300deg,
+    #3b82f6 320deg,
+    #a855f7 340deg,
+    transparent 360deg
+  );
+  animation: border-beam 4s linear infinite;
+  z-index: -1;
 }

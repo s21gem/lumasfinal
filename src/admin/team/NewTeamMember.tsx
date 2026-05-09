@@ -148,6 +148,7 @@ export default function NewTeamMember() {
             <label htmlFor="imageUrl" className="block text-sm font-medium">
               Image URL
             </label>
+            <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mb-2">📐 800×800px (1:1) • JPG/PNG/WebP • Max 5MB</p>
             <div className="flex gap-4 items-start">
               <div className="flex-1">
                 <input
