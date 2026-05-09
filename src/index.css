@@ -63,14 +63,15 @@ h1, h2, h3, h4, h5, h6, .font-black, .font-bold {
 
 @media (max-width: 640px) {
   h1 {
-    @apply text-4xl !important;
+    font-size: 2.25rem !important; /* text-4xl equivalents */
     line-height: 1.1 !important;
   }
   h2 {
-    @apply text-3xl !important;
+    font-size: 1.875rem !important; /* text-3xl equivalents */
     line-height: 1.1 !important;
   }
   .max-w-7xl {
-    @apply px-4 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
   }
 }
