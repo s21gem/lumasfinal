@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Upload } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
+import VideoPreview from '../VideoPreview';
 
 export default function NewProject() {
   const { id } = useParams();
@@ -252,6 +253,17 @@ export default function NewProject() {
                   if (file) handleFileUpload(file, 'videoUrl', setUploadingVideo);
                 }} />
               </label>
+              {formData.videoUrl && (
+                <div className="mt-4">
+                  {formData.contentType === 'video' ? (
+                    <VideoPreview url={formData.videoUrl} />
+                  ) : (
+                    <div className="w-32 h-40 rounded-lg overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                      <img src={getMediaUrl(formData.videoUrl)} alt="Preview" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Thumbnail */}

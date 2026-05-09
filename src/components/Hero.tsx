@@ -41,16 +41,40 @@ export default function Hero() {
   return (
     <section id="home" className="relative w-full h-screen flex flex-col justify-between overflow-hidden bg-white dark:bg-black">
       {/* Background Video */}
-      <div className="absolute inset-0 w-full h-full z-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover opacity-40"
-          src={getMediaUrl(settings.heroVideoUrl, 'video')}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/20 to-white dark:from-black/60 dark:via-black/20 dark:to-black"></div>
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-black">
+        {(() => {
+          if (!settings.heroVideoUrl) return null;
+          
+          const isYouTube = settings.heroVideoUrl.includes('youtube.com') || settings.heroVideoUrl.includes('youtu.be');
+          
+          if (isYouTube) {
+            const ytMatch = settings.heroVideoUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})/);
+            const videoId = ytMatch ? ytMatch[1] : '';
+            
+            if (videoId) {
+              return (
+                <iframe
+                  src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&loop=1&playlist=${videoId}&playsinline=1`}
+                  className="absolute top-1/2 left-1/2 w-[300vw] h-[300vw] md:w-[150vw] md:h-[150vw] -translate-x-1/2 -translate-y-1/2 opacity-40"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  style={{ border: 0 }}
+                ></iframe>
+              );
+            }
+          }
+          
+          return (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full h-full object-cover opacity-40"
+              src={getMediaUrl(settings.heroVideoUrl, 'video')}
+            />
+          );
+        })()}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/20 to-white dark:from-black/60 dark:via-black/20 dark:to-black pointer-events-none"></div>
       </div>
 
       {/* Content */}

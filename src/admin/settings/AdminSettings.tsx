@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Upload, Image as ImageIcon, Globe, Phone, MessageCircle, Calendar, Share2, Type, Layout, Search, Award } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
+import VideoPreview from '../VideoPreview';
 
 type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands' | 'policies' | 'booking' | 'account';
 
@@ -248,8 +249,8 @@ export default function AdminSettings() {
                 </label>
               </div>
               {settings.heroVideoUrl && (
-                <div className="mt-4 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 aspect-video">
-                  <video src={getMediaUrl(settings.heroVideoUrl, 'video')} className="w-full h-full object-cover" muted loop autoPlay />
+                <div className="mt-4">
+                  <VideoPreview url={settings.heroVideoUrl} />
                 </div>
               )}
             </div>

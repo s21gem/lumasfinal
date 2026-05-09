@@ -1,6 +1,6 @@
 /**
  * Utility to convert various media links (like Google Drive) into direct links 
- * that can be used in <img> and <video> tags.
+ * that can be used in <img> and <video> tags, and to optimize Cloudinary URLs.
  */
 export const getMediaUrl = (url: string | null | undefined, type: 'image' | 'video' | 'auto' = 'auto'): string => {
   if (!url) return '';
@@ -27,7 +27,14 @@ export const getMediaUrl = (url: string | null | undefined, type: 'image' | 'vid
     return `https://lh3.googleusercontent.com/d/${fileId}`;
   }
   
-  // 2. Add other conversions here if needed (e.g. Dropbox, etc.)
+  // 2. Cloudinary Optimization
+  if (url.includes('res.cloudinary.com')) {
+    // Check if it already has transformations to avoid duplicating
+    if (!url.includes('/upload/q_auto') && !url.includes('/upload/f_auto')) {
+      // Inject q_auto,f_auto right after /upload/ to serve highly compressed WebP/WebM
+      return url.replace('/upload/', '/upload/q_auto,f_auto/');
+    }
+  }
   
   return url;
 };

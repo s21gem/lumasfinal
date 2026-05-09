@@ -82,6 +82,24 @@ router.post("/", requireAuth, async (req, res) => {
 
 // PUT update testimonial (Protected)
 router.put("/:id", requireAuth, async (req, res) => {
+  if (req.params.id === "reorder") {
+    try {
+      const { items } = req.body;
+      await prisma.$transaction(
+        items.map((item: any) =>
+          prisma.testimonial.update({
+            where: { id: item.id },
+            data: { sortOrder: item.sortOrder },
+          })
+        )
+      );
+      return res.json({ message: "Testimonials reordered" });
+    } catch (error) {
+      console.error("Error reordering testimonials:", error);
+      return res.status(500).json({ error: "Failed to reorder testimonials" });
+    }
+  }
+
   try {
     const { clientName, role, company, quote, videoUrl, imageUrl, sortOrder, ytSubscribers, ytViews, igFollowers, fbFollowers, tiktokFollowers } = req.body;
     const testimonial = await prisma.testimonial.update({

@@ -8,7 +8,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const teamMembers = await prisma.teamMember.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { sortOrder: "asc" },
     });
     res.json(teamMembers);
   } catch (error) {
@@ -37,11 +37,13 @@ router.get("/:id", async (req, res) => {
 router.post("/", requireAuth, async (req, res) => {
   try {
     const { name, role, imageUrl } = req.body;
+    const count = await prisma.teamMember.count();
     const teamMember = await prisma.teamMember.create({
       data: {
         name,
         role,
         imageUrl,
+        sortOrder: count,
       },
     });
     res.status(201).json(teamMember);
@@ -53,14 +55,33 @@ router.post("/", requireAuth, async (req, res) => {
 
 // Update a team member
 router.put("/:id", requireAuth, async (req, res) => {
+  if (req.params.id === "reorder") {
+    try {
+      const { items } = req.body;
+      await prisma.$transaction(
+        items.map((item: any) =>
+          prisma.teamMember.update({
+            where: { id: item.id },
+            data: { sortOrder: item.sortOrder },
+          })
+        )
+      );
+      return res.json({ message: "Team reordered" });
+    } catch (error) {
+      console.error("Error reordering team:", error);
+      return res.status(500).json({ error: "Failed to reorder team" });
+    }
+  }
+
   try {
-    const { name, role, imageUrl } = req.body;
+    const { name, role, imageUrl, sortOrder } = req.body;
     const teamMember = await prisma.teamMember.update({
       where: { id: req.params.id },
       data: {
         name,
         role,
         imageUrl,
+        sortOrder,
       },
     });
     res.json(teamMember);

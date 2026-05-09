@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Loader2, Upload } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
+import VideoPreview from '../VideoPreview';
 
 export default function NewTestimonial() {
   const { id } = useParams();
@@ -177,26 +178,8 @@ export default function NewTestimonial() {
                 }} />
               </label>
               {formData.videoUrl && (
-                <div className="mt-4 w-full aspect-video rounded-xl overflow-hidden bg-black border border-black/5 dark:border-white/5">
-                  {formData.videoUrl.includes('youtube.com') || formData.videoUrl.includes('youtu.be') ? (
-                    <iframe
-                      src={formData.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                      className="w-full h-full border-0"
-                      allowFullScreen
-                    ></iframe>
-                  ) : formData.videoUrl.includes('drive.google.com') ? (
-                    <iframe
-                      src={formData.videoUrl.replace('/view', '/preview')}
-                      className="w-full h-full border-0"
-                      allowFullScreen
-                    ></iframe>
-                  ) : (
-                    <video
-                      src={getMediaUrl(formData.videoUrl, 'video')}
-                      className="w-full h-full object-contain"
-                      controls
-                    ></video>
-                  )}
+                <div className="mt-4">
+                  <VideoPreview url={formData.videoUrl} />
                 </div>
               )}
             </div>
