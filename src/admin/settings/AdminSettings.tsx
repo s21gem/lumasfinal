@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Save, Loader2, Upload, Image as ImageIcon, Globe, Phone, MessageCircle, Calendar, Share2, Type, Layout, Search, Award } from 'lucide-react';
 import { getMediaUrl } from '../../utils/media';
 
-type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands' | 'policies' | 'account';
+type SettingsTab = 'hero' | 'logo' | 'contact' | 'social' | 'team' | 'footer' | 'seo' | 'brands' | 'policies' | 'booking' | 'account';
 
 export default function AdminSettings() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('hero');
@@ -49,6 +49,11 @@ export default function AdminSettings() {
     trustedBrandsMarqueeSpeed: 40,
     privacyPolicy: '',
     termsOfService: '',
+    defaultMeetingDuration: 30,
+    businessHoursStart: '10:00',
+    businessHoursEnd: '18:00',
+    whatsappNotifyNumber: '',
+    whatsappApiKey: '',
   });
 
   useEffect(() => {
@@ -144,6 +149,7 @@ export default function AdminSettings() {
     { key: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
     { key: 'brands', label: 'Brands', icon: <Award className="w-4 h-4" /> },
     { key: 'policies', label: 'Policies', icon: <Globe className="w-4 h-4" /> },
+    { key: 'booking', label: 'Booking System', icon: <Calendar className="w-4 h-4" /> },
     { key: 'account', label: 'Account', icon: <Phone className="w-4 h-4" /> },
   ];
 
@@ -535,6 +541,66 @@ export default function AdminSettings() {
             </div>
           </div>
         )}
+        {/* BOOKING SYSTEM TAB */}
+        {activeTab === 'booking' && (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-xl font-bold">Booking System Settings</h3>
+              <p className="text-sm text-zinc-500 mt-1">Configure your default availability and WhatsApp notification alerts.</p>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="text-lg font-bold border-b border-black/5 dark:border-white/5 pb-2">Business Hours & Duration</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className={labelClass}>Default Meeting Duration (Mins)</label>
+                  <input type="number" name="defaultMeetingDuration" value={settings.defaultMeetingDuration} onChange={handleChange} className={inputClass} placeholder="30" />
+                </div>
+                <div>
+                  <label className={labelClass}>Start Time (HH:MM)</label>
+                  <input type="time" name="businessHoursStart" value={settings.businessHoursStart} onChange={handleChange} className={inputClass} />
+                </div>
+                <div>
+                  <label className={labelClass}>End Time (HH:MM)</label>
+                  <input type="time" name="businessHoursEnd" value={settings.businessHoursEnd} onChange={handleChange} className={inputClass} />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6 pt-6 border-t border-black/5 dark:border-white/5">
+              <div>
+                <h4 className="text-lg font-bold flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-emerald-500" />
+                  WhatsApp Notifications (CallMeBot)
+                </h4>
+                <p className="text-sm text-zinc-500 mt-1">
+                  Get instant WhatsApp messages when someone books a session. We use the free <strong>CallMeBot API</strong>.
+                </p>
+                <div className="bg-blue-50 dark:bg-blue-500/10 text-blue-800 dark:text-blue-300 p-4 rounded-xl mt-3 text-sm">
+                  <strong>How to get your API Key:</strong>
+                  <ol className="list-decimal pl-5 mt-1 space-y-1">
+                    <li>Add the phone number <strong>+34 691 62 17 28</strong> into your Phone Contacts.</li>
+                    <li>Send this message: <code>I allow callmebot to send me messages</code> to the new Contact via WhatsApp.</li>
+                    <li>Wait for the bot to reply with your unique API KEY.</li>
+                  </ol>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={labelClass}>Your Phone Number</label>
+                  <input type="text" name="whatsappNotifyNumber" value={settings.whatsappNotifyNumber} onChange={handleChange} className={inputClass} placeholder="+880123456789" />
+                  <p className="text-xs text-zinc-500 mt-1">Include country code and the '+' sign (e.g. +880...)</p>
+                </div>
+                <div>
+                  <label className={labelClass}>CallMeBot API Key</label>
+                  <input type="text" name="whatsappApiKey" value={settings.whatsappApiKey} onChange={handleChange} className={inputClass} placeholder="Enter your secret API key" />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ACCOUNT TAB */}
         {activeTab === 'account' && (
           <div className="space-y-8">

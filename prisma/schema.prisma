@@ -7,7 +7,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -141,6 +141,37 @@ model Settings {
   // Policies
   privacyPolicy        String?
   termsOfService       String?
+  
+  // Booking Settings
+  defaultMeetingDuration Int @default(30) // in minutes
+  businessHoursStart     String @default("10:00")
+  businessHoursEnd       String @default("18:00")
+  whatsappNotifyNumber   String? // CallMeBot Phone Number
+  whatsappApiKey         String? // CallMeBot API Key
+}
+
+model Appointment {
+  id          String   @id @default(cuid())
+  clientName  String
+  clientEmail String
+  clientPhone String
+  serviceType String
+  date        DateTime // Store the date (normalized to midnight)
+  timeSlot    String   // Store the time string like "10:30 AM"
+  notes       String?
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, CANCELLED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ScheduleBlock {
+  id        String   @id @default(cuid())
+  date      DateTime // Date of the block
+  startTime String?  // Optional: If null, the whole day is blocked
+  endTime   String?  // Optional: If null, the whole day is blocked
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Message {

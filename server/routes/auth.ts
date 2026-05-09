@@ -22,21 +22,26 @@ router.post("/login", async (req, res) => {
     // Find user
     const user = await prisma.user.findUnique({ where: { email } });
     
-    // For demo purposes, if no user exists, create the first admin user
+    // Create the first admin user if the database is completely empty
     if (!user) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        },
-      });
-      
-      const token = jwt.sign({ id: newUser.id, email: newUser.email }, secret, {
-        expiresIn: "7d",
-      });
-      
-      return res.json({ token, user: { id: newUser.id, email: newUser.email } });
+      const userCount = await prisma.user.count();
+      if (userCount === 0) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await prisma.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        });
+        
+        const token = jwt.sign({ id: newUser.id, email: newUser.email }, secret, {
+          expiresIn: "7d",
+        });
+        
+        return res.json({ token, user: { id: newUser.id, email: newUser.email } });
+      } else {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
     }
 
     // Verify password

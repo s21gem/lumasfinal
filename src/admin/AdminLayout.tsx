@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FolderKanban, Users, MessageSquare, LogOut, Settings, Zap, GitBranch, Award, Menu, X, Mail } from 'lucide-react';
+import { LayoutDashboard, FolderKanban, Users, MessageSquare, LogOut, Settings, Zap, GitBranch, Award, Menu, X, Mail, Calendar, Clock } from 'lucide-react';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -27,6 +27,8 @@ export default function AdminLayout() {
   const navItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
     { path: '/admin/messages', icon: Mail, label: 'Inbox' },
+    { path: '/admin/appointments', icon: Calendar, label: 'Appointments' },
+    { path: '/admin/schedule', icon: Clock, label: 'Schedule Blocks' },
     { path: '/admin/projects', icon: FolderKanban, label: 'Projects' },
     { path: '/admin/team', icon: Users, label: 'Team' },
     { path: '/admin/testimonials', icon: MessageSquare, label: 'Testimonials' },

@@ -16,6 +16,8 @@ import trustedBrandsRoutes from "./server/routes/trustedBrands";
 import contactRoutes from "./server/routes/contact";
 import uploadRoutes from "./server/routes/upload";
 import messagesRoutes from "./server/routes/messages";
+import appointmentsRoutes from "./server/routes/appointments";
+import schedulesRoutes from "./server/routes/schedules";
 
 async function startServer() {
   const app = express();
@@ -36,6 +38,8 @@ async function startServer() {
   app.use("/api/contact", contactRoutes);
   app.use("/api/upload", uploadRoutes);
   app.use("/api/messages", messagesRoutes);
+  app.use("/api/appointments", appointmentsRoutes);
+  app.use("/api/schedules", schedulesRoutes);
 
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });

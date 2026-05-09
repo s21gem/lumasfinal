@@ -30,6 +30,8 @@ import AdminProcess from './admin/process/AdminProcess';
 import NewProcessStep from './admin/process/NewProcessStep';
 import AdminTrustedBrands from './admin/trusted-brands/AdminTrustedBrands';
 import AdminMessages from './admin/messages/AdminMessages';
+import AdminAppointments from './admin/appointments/AdminAppointments';
+import ScheduleManager from './admin/appointments/ScheduleManager';
 
 function HomePage() {
   return (
@@ -100,6 +102,10 @@ function App() {
 
             {/* Messages/Inbox */}
             <Route path="messages" element={<AdminMessages />} />
+
+            {/* Appointments */}
+            <Route path="appointments" element={<AdminAppointments />} />
+            <Route path="schedule" element={<ScheduleManager />} />
 
             {/* Settings */}
             <Route path="settings" element={<AdminSettings />} />

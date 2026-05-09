@@ -31,6 +31,9 @@ router.get("/", async (req, res) => {
           siteDescription: "Creative Production and Post-production Studio",
           trustedBrandsGrayscale: true,
           trustedBrandsMarqueeSpeed: 40,
+          defaultMeetingDuration: 30,
+          businessHoursStart: "10:00",
+          businessHoursEnd: "18:00",
         },
       });
     }
@@ -83,6 +86,12 @@ router.put("/", requireAuth, async (req, res) => {
       // Policies
       privacyPolicy,
       termsOfService,
+      // Booking Settings
+      defaultMeetingDuration,
+      businessHoursStart,
+      businessHoursEnd,
+      whatsappNotifyNumber,
+      whatsappApiKey,
     } = req.body;
 
     const updateData: any = {};
@@ -116,6 +125,11 @@ router.put("/", requireAuth, async (req, res) => {
     if (trustedBrandsMarqueeSpeed !== undefined) updateData.trustedBrandsMarqueeSpeed = trustedBrandsMarqueeSpeed;
     if (privacyPolicy !== undefined) updateData.privacyPolicy = privacyPolicy;
     if (termsOfService !== undefined) updateData.termsOfService = termsOfService;
+    if (defaultMeetingDuration !== undefined) updateData.defaultMeetingDuration = defaultMeetingDuration;
+    if (businessHoursStart !== undefined) updateData.businessHoursStart = businessHoursStart;
+    if (businessHoursEnd !== undefined) updateData.businessHoursEnd = businessHoursEnd;
+    if (whatsappNotifyNumber !== undefined) updateData.whatsappNotifyNumber = whatsappNotifyNumber;
+    if (whatsappApiKey !== undefined) updateData.whatsappApiKey = whatsappApiKey;
 
     const settings = await prisma.settings.upsert({
       where: { id: "global" },

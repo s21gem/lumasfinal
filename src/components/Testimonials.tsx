@@ -59,6 +59,7 @@ export default function Testimonials() {
             className={`w-full h-full object-contain bg-black ${isPlaying ? 'block' : 'hidden'}`}
             controls={isPlaying}
             playsInline
+            onEnded={() => setIsPlaying(false)}
           />
         )}
 
