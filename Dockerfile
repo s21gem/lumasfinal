@@ -10,7 +10,7 @@ RUN npm install
 # Copy source and prisma
 COPY . .
 
-# Generate Prisma Client
+# Generate Prisma Client (to the custom output path src/generated/prisma)
 RUN npx prisma generate
 
 # Build frontend
@@ -21,7 +21,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Install runtime dependencies for Prisma/SQLite
+# Install runtime dependencies for Prisma
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 
 # Copy built assets and necessary files
@@ -29,12 +29,13 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/src/generated ./src/generated
 COPY --from=builder /app/server ./server
 COPY --from=builder /app/server.ts ./
 COPY --from=builder /app/tsconfig.json ./
 
 # Create uploads directory
-RUN mkdir -p uploads prisma && chmod 777 uploads prisma
+RUN mkdir -p uploads && chmod 777 uploads
 
 # Expose port
 EXPOSE 3001
