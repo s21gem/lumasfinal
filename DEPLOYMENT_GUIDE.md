@@ -1,99 +1,145 @@
-# Deployment Guide (Docker + Traefik)
+# Comprehensive Deployment Guide (Docker + Traefik)
 
-Since your Hostinger VPS is running **Ubuntu 24.04 with Docker and Traefik**, we will use a containerized deployment. This is the most efficient and secure way to run your application.
-
----
-
-## 1. Server Details
-- **IP:** `72.60.202.195`
-- **Hostname:** `srv1663020.hstgr.cloud`
-- **Stack:** Docker, Traefik v2/v3
+This guide provides a detailed, step-by-step process to deploy your Lumas Creative Portfolio on a Hostinger VPS (Ubuntu 24.04) using Docker and Traefik.
 
 ---
 
-## 2. Preparation
+## 1. Prerequisites
+Before starting, ensure you have:
+- Access to your Hostinger VPS via SSH.
+- Your Domain Name (e.g., `lumascreative.com`) pointed to the VPS IP (`72.60.202.195`).
+- Traefik already running on your server (Hostinger's default Docker + Traefik template).
 
-### Step 1: Upload Code
-Clone your repository to the server:
+---
+
+## 2. Step-by-Step Deployment
+
+### Step 1: Connect to your Server
+Open your terminal (PowerShell, CMD, or Terminal) and log in to your VPS:
 ```bash
-cd /root # or your preferred directory
-git clone <your-repo-url>
-cd lumas-creative-portfolio
+ssh root@72.60.202.195
+```
+*(Enter your root password when prompted)*
+
+### Step 2: Create the Project Directory
+We will store the project in `/var/www/Lumas Creative` to keep it organized.
+```bash
+# Create the directory
+mkdir -p "/var/www/Lumas Creative"
+
+# Navigate into the directory
+cd "/var/www/Lumas Creative"
 ```
 
-### Step 2: Configure Environment
-Create the `.env` file and fill in your credentials.
+### Step 3: Clone the Repository
+Download your code from GitHub into the current folder:
+```bash
+git clone https://github.com/s21gem/lumasfinal.git .
+```
+*(The `.` at the end ensures it clones files directly into 'Lumas Creative' instead of creating another subfolder)*
+
+### Step 4: Configure Environment Variables
+You must create a `.env` file to store your secrets.
 ```bash
 nano .env
 ```
-Ensure `DATABASE_URL` is set to `"file:./prisma/dev.db"` (Docker will persist this).
+Copy and paste the following, then edit the values:
+```env
+PORT=3001
+DATABASE_URL="file:./prisma/dev.db"
+JWT_SECRET="generate_a_long_random_string_here"
 
----
+# Cloudinary (Required for image/video storage)
+CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
 
-## 3. Docker Configuration
+# WhatsApp (Optional)
+WHATSAPP_PHONE_NUMBER="your_number"
+WHATSAPP_API_KEY="your_key"
+```
+*Press `Ctrl + O`, `Enter` to save, and `Ctrl + X` to exit.*
 
-I have already created the `Dockerfile` and `docker-compose.yml`. You just need to check the **Traefik labels** in `docker-compose.yml`.
-
-### Adjust `docker-compose.yml`
-Open the file:
+### Step 5: Customize Docker Configuration
+The `docker-compose.yml` needs to know your domain to tell Traefik how to route traffic.
 ```bash
 nano docker-compose.yml
 ```
-1.  **Network**: Change `traefik-public` if your Traefik network has a different name (often `proxy` or `traefik_network`).
-2.  **Domain**: Change `yourdomain.com` to your actual domain.
-3.  **CertResolver**: Change `letsencrypt` if your Traefik uses a different resolver name.
+Look for the `labels` section and update these:
+1.  `Host(`lumascreative.com`)` -> Already updated for you in the file.
+2.  `traefik.http.routers.lumas.tls.certresolver=letsencrypt` -> Verify if your Traefik uses `letsencrypt` or another name (e.g., `myresolver`).
+3.  `networks: - traefik-public` -> Verify your Traefik network name (`docker network ls`).
 
----
-
-## 4. Deployment Commands
-
-Run these commands to build and start your application:
-
+### Step 6: Deploy the Application
+Now, let Docker build the image and start the container.
 ```bash
-# Ensure the Traefik network exists (if not external)
-# docker network create traefik-public
-
-# Build and start the container in detached mode
+# Build the container (this might take a few minutes the first time)
 docker compose up -d --build
 ```
+*The `-d` flag runs it in the background.*
 
----
-
-## 5. Persistence & Database
-
-Your database and uploads are mapped to the host for persistence:
--   **Database**: `./prisma/dev.db`
--   **Uploads**: `./uploads/`
-
-If you need to run Prisma commands inside the container:
+### Step 7: Initialize the Database
+Once the container is running, you need to sync the database schema.
 ```bash
 docker exec -it lumas-portfolio npx prisma db push
 ```
 
 ---
 
-## 6. Logs & Maintenance
+## 3. Post-Deployment Checks
 
-To check if everything is running correctly:
+### Verify the App is Running
+Check the status of your container:
 ```bash
-# Check logs
+docker ps
+```
+You should see `lumas-portfolio` with a status of `Up`.
+
+### Check Logs
+If the website doesn't load, check the logs for errors:
+```bash
 docker compose logs -f
+```
 
-# Restart container
+### Accessing the Website
+Open your browser and go to `https://yourdomain.com`. 
+- Traefik will automatically handle the SSL (HTTPS) certificate.
+- The Admin panel will be available at `https://yourdomain.com/admin`.
+
+---
+
+## 4. Common Maintenance Commands
+
+**To update the website after pushing new code to GitHub:**
+```bash
+git pull
+docker compose up -d --build
+```
+
+**To restart the app:**
+```bash
 docker compose restart
+```
 
-# Stop container
+**To stop the app:**
+```bash
 docker compose down
 ```
 
 ---
 
-## Troubleshooting
-
--   **Traefik Not Routing**: Verify that the container is on the same network as the Traefik container (`docker network inspect traefik-public`).
--   **Port 3001**: Docker internally uses 3001. Traefik will route traffic to this port automatically via labels.
--   **SSL Issues**: Check Traefik logs for Let's Encrypt certificate generation status.
+## 5. Directory Structure on Server
+```text
+/var/www/Lumas Creative/
+├── Dockerfile
+├── docker-compose.yml
+├── .env
+├── prisma/
+│   └── dev.db  <-- (Your Database File - Safe here)
+├── uploads/    <-- (Uploaded Files - Safe here)
+└── ...
+```
 
 ---
 
-**Lumas Creative Studio - 2026**
+**Prepared by Antigravity AI - 2026**
