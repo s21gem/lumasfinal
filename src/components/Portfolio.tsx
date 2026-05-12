@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
+import { PortfolioSkeleton } from './ui/Skeleton';
 
 interface Project {
   id: string;
@@ -15,18 +17,11 @@ interface Project {
 }
 
 export default function Portfolio() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const { projects, loading } = useData();
   const [activeFilter, setActiveFilter] = useState('All');
-  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch('/api/projects')
-      .then(r => r.json())
-      .then(data => { setProjects(data); })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  if (loading) return <PortfolioSkeleton />;
 
   // Derive unique categories from projects
   const categories = ['All', ...Array.from(new Set(projects.map(p => p.category)))];
@@ -40,7 +35,7 @@ export default function Portfolio() {
   };
 
   return (
-    <section id="portfolio" className="py-24 bg-zinc-50 dark:bg-zinc-950 min-h-screen">
+    <section id="portfolio" className="py-24 bg-zinc-50 dark:bg-[#000d11] min-h-screen">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
           <div>
@@ -58,7 +53,7 @@ export default function Portfolio() {
                 onClick={() => setActiveFilter(category)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                   activeFilter === category 
-                    ? 'bg-cyan-400 text-black shadow-[0_0_10px_rgba(34,211,238,0.4)]' 
+                    ? 'bg-cyan-500 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)]' 
                     : 'bg-black/5 dark:bg-white/5 text-gray-600 dark:text-gray-400 hover:bg-black/10 active:bg-black/10 dark:hover:bg-white/10 dark:active:bg-white/10 hover:text-black active:text-black dark:hover:text-white dark:active:text-white'
                 }`}
               >
@@ -68,11 +63,7 @@ export default function Portfolio() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-cyan-400 rounded-full animate-spin" />
-          </div>
-        ) : filteredItems.length === 0 ? (
+        {filteredItems.length === 0 ? (
           <div className="text-center py-20 text-zinc-500">
             <p className="text-xl">No projects found. Add projects from the admin panel.</p>
           </div>

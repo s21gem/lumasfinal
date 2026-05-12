@@ -41,6 +41,14 @@ export default function AdminSettings() {
     linkedinUrl: '',
     youtubeUrl: '',
     teamCarouselDistance: 380,
+    teamCarouselCardSize: 280,
+    teamCarouselGrayscale: true,
+    teamHeaderTitle: 'Small team,',
+    teamHeaderHighlight: 'Big Production.',
+    teamBackgroundText: 'big results',
+    teamBackgroundTextSize: 50,
+    teamBackgroundTextLineHeight: 0.9,
+    teamCarouselStairOffset: 100,
     footerTagline: '',
     copyrightText: '',
     siteTitle: '',
@@ -80,7 +88,14 @@ export default function AdminSettings() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setSettings(prev => ({ ...prev, [name]: name === 'teamCarouselDistance' ? parseInt(value) || 0 : value }));
+    setSettings(prev => ({ 
+      ...prev, 
+      [name]: (name === 'teamCarouselDistance' || name === 'teamCarouselCardSize' || name === 'teamBackgroundTextSize' || name === 'teamCarouselStairOffset') 
+        ? parseInt(value) || 0 
+        : (name === 'teamBackgroundTextLineHeight') 
+          ? parseFloat(value) || 0 
+          : value 
+    }));
   };
 
   const handleSave = async () => {
@@ -404,25 +419,143 @@ export default function AdminSettings() {
         {activeTab === 'team' && (
           <div className="space-y-6">
             <h3 className="text-xl font-bold mb-4">Team Carousel Settings</h3>
-            <div className="max-w-xl">
-              <label className={labelClass}>Desktop Carousel Distance (Radius): {settings.teamCarouselDistance}px</label>
-              <input
-                type="range"
-                name="teamCarouselDistance"
-                min="150"
-                max="800"
-                step="10"
-                value={settings.teamCarouselDistance}
-                onChange={handleChange}
-                className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700"
-              />
-              <div className="flex justify-between text-xs text-zinc-500 mt-1">
-                <span>150px (compact)</span>
-                <span>800px (spread)</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className={labelClass}>Header Title</label>
+                <input type="text" name="teamHeaderTitle" value={settings.teamHeaderTitle} onChange={handleChange} className={inputClass} placeholder="Small team," />
               </div>
-              <p className="text-sm text-zinc-500 mt-3">
-                Adjust the distance between image cards in the 3D carousel. Decrease for fewer members, increase for more.
-              </p>
+              <div>
+                <label className={labelClass}>Header Highlight (Gradient)</label>
+                <input type="text" name="teamHeaderHighlight" value={settings.teamHeaderHighlight} onChange={handleChange} className={inputClass} placeholder="Big Production." />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 border-b border-black/5 dark:border-white/5 pb-6">
+              <div className="col-span-full">
+                <label className={labelClass}>Background Parallax Text (Line breaks supported)</label>
+                <textarea name="teamBackgroundText" value={settings.teamBackgroundText} onChange={handleChange} rows={3} className={inputClass + ' resize-none'} placeholder="big\nresults" />
+              </div>
+              
+              <div>
+                <label className={labelClass}>Text Size (Desktop VW): {settings.teamBackgroundTextSize}</label>
+                <input
+                  type="range"
+                  name="teamBackgroundTextSize"
+                  min="5"
+                  max="150"
+                  step="1"
+                  value={settings.teamBackgroundTextSize}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-cyan-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1 font-medium">
+                  <span>Smaller (5vw)</span>
+                  <span>Massive (150vw)</span>
+                </div>
+              </div>
+
+              <div>
+                <label className={labelClass}>Line Spacing (Line Height): {settings.teamBackgroundTextLineHeight}</label>
+                <input
+                  type="range"
+                  name="teamBackgroundTextLineHeight"
+                  min="0.5"
+                  max="1.5"
+                  step="0.05"
+                  value={settings.teamBackgroundTextLineHeight}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-cyan-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1 font-medium">
+                  <span>Tight (0.5)</span>
+                  <span>Loose (1.5)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="border-t border-black/5 dark:border-white/5 pt-6 grid gap-8">
+              <div className="max-w-xl">
+                <label className={labelClass}>Desktop Carousel Distance (Radius): {settings.teamCarouselDistance}px</label>
+                <input
+                  type="range"
+                  name="teamCarouselDistance"
+                  min="150"
+                  max="800"
+                  step="10"
+                  value={settings.teamCarouselDistance}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-cyan-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1 font-medium">
+                  <span>150px (compact)</span>
+                  <span>800px (spread)</span>
+                </div>
+                <p className="text-sm text-zinc-500 mt-3">
+                  Adjust the distance between image cards in the 3D carousel.
+                </p>
+              </div>
+
+              <div className="max-w-xl">
+                <label className={labelClass}>Card Size (Width): {settings.teamCarouselCardSize}px</label>
+                <input
+                  type="range"
+                  name="teamCarouselCardSize"
+                  min="150"
+                  max="500"
+                  step="10"
+                  value={settings.teamCarouselCardSize}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-cyan-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1 font-medium">
+                  <span>150px (small)</span>
+                  <span>500px (large)</span>
+                </div>
+                <p className="text-sm text-zinc-500 mt-3">
+                  Control the size of the cards in the merry-go-round.
+                </p>
+              </div>
+
+              <div className="max-w-xl">
+                <label className={labelClass}>Staircase Offset (Vertical Spread): {settings.teamCarouselStairOffset}px</label>
+                <input
+                  type="range"
+                  name="teamCarouselStairOffset"
+                  min="0"
+                  max="300"
+                  step="5"
+                  value={settings.teamCarouselStairOffset}
+                  onChange={handleChange}
+                  className="w-full h-2 bg-zinc-200 rounded-lg appearance-none cursor-pointer dark:bg-zinc-700 accent-cyan-500"
+                />
+                <div className="flex justify-between text-xs text-zinc-500 mt-1 font-medium">
+                  <span>0px (flat / no stairs)</span>
+                  <span>300px (steep stairs)</span>
+                </div>
+                <p className="text-sm text-zinc-500 mt-3">
+                  Controls how much vertical difference there is between each card in the diagonal staircase layout. Set to 0 for all cards on the same level.
+                </p>
+              </div>
+              
+              <div className="bg-zinc-50 dark:bg-zinc-950 border border-black/10 dark:border-white/10 rounded-xl p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-bold text-black dark:text-white">Grayscale Effect</h4>
+                    <p className="text-sm text-zinc-500 mt-1">
+                      If enabled, team cards will be grayscale and become full color on hover. If disabled, they are always full color.
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer ml-4">
+                    <input 
+                      type="checkbox" 
+                      className="sr-only peer" 
+                      checked={settings.teamCarouselGrayscale}
+                      onChange={(e) => setSettings(prev => ({ ...prev, teamCarouselGrayscale: e.target.checked }))}
+                    />
+                    <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-cyan-500"></div>
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         )}

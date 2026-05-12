@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Quote, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import CTAButton from './CTAButton';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
 
 interface TestimonialData {
   id: string;
@@ -26,98 +27,118 @@ interface PaginationData {
   totalPages: number;
 }
 
-export default function Testimonials() {
-  const [testimonials, setTestimonials] = useState<TestimonialData[]>([]);
-  const [pagination, setPagination] = useState<PaginationData>({ page: 1, limit: 2, total: 0, totalPages: 0 });
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
+// Dedicated component to handle synchronous play() calls for native videos
+const TestimonialMedia = ({ testimonial }: { testimonial: TestimonialData }) => {
+  const [isPlaying, setIsPlaying] = React.useState(false);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
 
-  // Dedicated component to handle synchronous play() calls for native videos
-  const TestimonialMedia = ({ testimonial }: { testimonial: TestimonialData }) => {
-    const [isPlaying, setIsPlaying] = useState(false);
-    const videoRef = React.useRef<HTMLVideoElement>(null);
-
-    const handlePlayClick = () => {
-      setIsPlaying(true);
-      if (videoRef.current) {
-        // Synchronous play call within the user gesture event handler bypasses autoplay blocks
-        videoRef.current.play().catch(console.error);
-      }
-    };
-
-    const isYouTube = testimonial.videoUrl?.includes('youtube.com') || testimonial.videoUrl?.includes('youtu.be');
-    const isDrive = testimonial.videoUrl?.includes('drive.google.com');
-    const isNativeVideo = testimonial.videoUrl && !isYouTube && !isDrive;
-
-    return (
-      <div className="w-full h-full relative group">
-        {/* Render native video immediately but hide it so we can sync-play it */}
-        {isNativeVideo && (
-          <video
-            ref={videoRef}
-            src={getMediaUrl(testimonial.videoUrl, 'video')}
-            className={`w-full h-full object-contain bg-black ${isPlaying ? 'block' : 'hidden'}`}
-            controls={isPlaying}
-            playsInline
-            onEnded={() => setIsPlaying(false)}
-          />
-        )}
-
-        {/* Iframes only render when playing to prevent background playing/loading */}
-        {(isYouTube || isDrive) && isPlaying && (
-          <div className="w-full h-full bg-black">
-            {isYouTube ? (
-              <iframe
-                src={testimonial.videoUrl!.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') + "?autoplay=1"}
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            ) : (
-              <iframe
-                src={testimonial.videoUrl!.replace('/view', '/preview')}
-                className="w-full h-full border-0"
-                allow="autoplay"
-                allowFullScreen
-              ></iframe>
-            )}
-          </div>
-        )}
-
-        {/* Thumbnail and Custom Play Button */}
-        {!isPlaying && (
-          <>
-            {testimonial.imageUrl ? (
-              <img
-                src={getMediaUrl(testimonial.imageUrl)}
-                alt={`${testimonial.clientName} Testimonial`}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105 group-focus:scale-105"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-cyan-400/20 to-fuchsia-500/20 flex items-center justify-center">
-                <Quote className="w-20 h-20 text-white/20" />
-              </div>
-            )}
-            {testimonial.videoUrl && (
-              <div 
-                className="absolute inset-0 bg-black/20 group-hover:bg-black/40 group-active:bg-black/40 group-focus:bg-black/40 transition-colors duration-500 flex items-center justify-center cursor-pointer z-10"
-                onClick={handlePlayClick}
-              >
-                <div className="w-16 h-16 rounded-full bg-cyan-400/90 backdrop-blur-sm flex items-center justify-center text-black shadow-xl transform group-hover:scale-110 group-active:scale-110 group-focus:scale-110 transition-transform duration-300">
-                  <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    );
+  const handlePlayClick = () => {
+    setIsPlaying(true);
+    if (videoRef.current) {
+      videoRef.current.play().catch(console.error);
+    }
   };
 
+  const isYouTube = testimonial.videoUrl?.includes('youtube.com') || testimonial.videoUrl?.includes('youtu.be');
+  const isDrive = testimonial.videoUrl?.includes('drive.google.com');
+  const isNativeVideo = testimonial.videoUrl && !isYouTube && !isDrive;
+
+  return (
+    <div className="w-full h-full relative group">
+      {isNativeVideo && (
+        <video
+          ref={videoRef}
+          src={getMediaUrl(testimonial.videoUrl, 'video')}
+          className={`w-full h-full object-contain bg-black ${isPlaying ? 'block' : 'hidden'}`}
+          controls={isPlaying}
+          playsInline
+          onEnded={() => setIsPlaying(false)}
+        />
+      )}
+
+      {(isYouTube || isDrive) && isPlaying && (
+        <div className="w-full h-full bg-black">
+          {isYouTube ? (
+            <iframe
+              src={testimonial.videoUrl!.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/') + "?autoplay=1"}
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            ></iframe>
+          ) : (
+            <iframe
+              src={testimonial.videoUrl!.replace('/view', '/preview')}
+              className="w-full h-full border-0"
+              allow="autoplay"
+              allowFullScreen
+            ></iframe>
+          )}
+        </div>
+      )}
+
+      {!isPlaying && (
+        <>
+          {testimonial.imageUrl ? (
+            <img
+              src={getMediaUrl(testimonial.imageUrl)}
+              alt={`${testimonial.clientName} Testimonial`}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 group-active:scale-105 group-focus:scale-105"
+              referrerPolicy="no-referrer"
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-violet-500/20 to-purple-600/20 flex items-center justify-center">
+              <Quote className="w-20 h-20 text-white/20" />
+            </div>
+          )}
+          {testimonial.videoUrl && (
+            <div 
+              className="absolute inset-0 bg-black/20 group-hover:bg-black/40 group-active:bg-black/40 group-focus:bg-black/40 transition-colors duration-500 flex items-center justify-center cursor-pointer z-10"
+              onClick={handlePlayClick}
+            >
+              <div className="w-16 h-16 rounded-full bg-cyan-500/90 backdrop-blur-sm flex items-center justify-center text-white shadow-xl transform group-hover:scale-110 group-active:scale-110 group-focus:scale-110 transition-transform duration-300">
+                <svg className="w-6 h-6 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+export default function Testimonials() {
+  const { testimonials: initialTestimonials, loading: globalLoading } = useData();
+  const [testimonials, setTestimonials] = useState<TestimonialData[]>(initialTestimonials.slice(0, 2));
+  const [pagination, setPagination] = useState<PaginationData>({ 
+    page: 1, 
+    limit: 2, 
+    total: initialTestimonials.length, 
+    totalPages: Math.ceil(initialTestimonials.length / 2) 
+  });
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Sync with global data when it arrives
+  useEffect(() => {
+    if (!globalLoading && initialTestimonials.length > 0) {
+      setTestimonials(initialTestimonials.slice(0, 2));
+      setPagination({
+        page: 1,
+        limit: 2,
+        total: initialTestimonials.length,
+        totalPages: Math.ceil(initialTestimonials.length / 2)
+      });
+    }
+  }, [globalLoading, initialTestimonials]);
+
   const fetchTestimonials = async (page: number) => {
+    if (page === 1 && initialTestimonials.length > 0) {
+       setTestimonials(initialTestimonials.slice(0, 2));
+       setLoading(false);
+       return;
+    }
     try {
       const res = await fetch(`/api/testimonials?page=${page}&limit=2`);
       if (res.ok) {
@@ -133,7 +154,9 @@ export default function Testimonials() {
   };
 
   useEffect(() => {
-    fetchTestimonials(currentPage);
+    if (currentPage !== 1) {
+      fetchTestimonials(currentPage);
+    }
   }, [currentPage]);
 
   const handlePageChange = (page: number) => {
@@ -144,7 +167,7 @@ export default function Testimonials() {
   // Fallback if no testimonials exist
   if (!loading && testimonials.length === 0 && pagination.total === 0) {
     return (
-      <section className="py-24 bg-zinc-50 dark:bg-zinc-950 border-t border-black/5 dark:border-white/5">
+      <section className="py-24 bg-zinc-50 dark:bg-[#000d11] border-t border-black/5 dark:border-white/5">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6">Client Stories</h2>
@@ -162,7 +185,7 @@ export default function Testimonials() {
   }
 
   return (
-    <section className="py-24 bg-zinc-50 dark:bg-zinc-950 border-t border-black/5 dark:border-white/5">
+    <section className="py-24 bg-zinc-50 dark:bg-[#000d11] border-t border-black/5 dark:border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-20">
           <h2 className="text-4xl md:text-6xl font-black text-black dark:text-white tracking-tighter mb-6">Client Stories</h2>
@@ -173,7 +196,7 @@ export default function Testimonials() {
 
         {loading ? (
           <div className="flex items-center justify-center h-64">
-            <div className="w-10 h-10 border-4 border-black/10 dark:border-white/10 border-t-cyan-400 rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-black/10 dark:border-white/10 border-t-violet-500 rounded-full animate-spin" />
           </div>
         ) : (
           <AnimatePresence mode="wait">
@@ -210,7 +233,7 @@ export default function Testimonials() {
                     transition={{ duration: 0.8, delay: 0.2 }}
                     className="w-full lg:w-1/2 flex flex-col justify-center"
                   >
-                    <Quote className="w-12 h-12 text-cyan-400/20 mb-6" />
+                    <Quote className="w-12 h-12 text-cyan-500/20 mb-6" />
                     <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-black dark:text-white leading-tight mb-8">
                       "{testimonial.quote}"
                     </h3>

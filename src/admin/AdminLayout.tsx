@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, FolderKanban, Users, MessageSquare, LogOut, Settings, Zap, GitBranch, Award, Menu, X, Mail, Calendar, Clock } from 'lucide-react';
 import Logo from '../components/Logo';
+import socket from '../utils/socket';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -25,7 +26,28 @@ export default function AdminLayout() {
     if (Notification.permission !== "granted" && Notification.permission !== "denied") {
       Notification.requestPermission();
     }
-  }, []);
+
+    const handleNewMessage = (msg: any) => {
+      // Only show browser notification if we're not already on the messages page
+      if (location.pathname !== '/admin/messages' && Notification.permission === "granted") {
+        new Notification("New Message from " + msg.name, {
+          body: msg.message.substring(0, 100) + (msg.message.length > 100 ? '...' : ''),
+          icon: '/favicon.ico'
+        });
+      }
+    };
+
+    socket.on('new_message', handleNewMessage);
+    
+    // Ensure socket is connected
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    return () => {
+      socket.off('new_message', handleNewMessage);
+    };
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');

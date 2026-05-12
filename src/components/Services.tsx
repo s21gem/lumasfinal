@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import * as LucideIcons from 'lucide-react';
 import CTAButton from './CTAButton';
+import { useData } from '../context/DataContext';
 
 interface ServiceData {
   id: string;
@@ -18,16 +19,7 @@ const getIcon = (name: string | null) => {
 };
 
 export default function Services() {
-  const [services, setServices] = useState<ServiceData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/services')
-      .then(r => r.json())
-      .then(setServices)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const { services, loading } = useData();
 
   // Fallback content if no services exist
   const displayServices = services.length > 0 ? services : [
@@ -40,9 +32,9 @@ export default function Services() {
   ];
 
   return (
-    <section id="services" className="py-24 bg-white dark:bg-black relative overflow-hidden">
+    <section id="services" className="py-24 bg-white dark:bg-[#000d11] relative overflow-hidden">
       {/* Background Elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-cyan-400/5 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-5xl h-[500px] bg-cyan-500/5 blur-[150px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="text-center mb-16">
@@ -53,8 +45,10 @@ export default function Services() {
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center h-48">
-            <div className="w-10 h-10 border-4 border-black/10 dark:border-white/10 border-t-cyan-400 rounded-full animate-spin" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="bg-zinc-50 dark:bg-zinc-900/50 p-8 rounded-2xl animate-pulse h-64" />
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
@@ -68,10 +62,10 @@ export default function Services() {
                   viewport={{ once: true, margin: "-100px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   tabIndex={0}
-                  className="group bg-zinc-50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 hover:border-cyan-400/30 active:border-cyan-400/30 focus:border-cyan-400/30 focus:outline-none cursor-pointer p-8 rounded-2xl transition-colors duration-300"
+                  className="group bg-zinc-50 dark:bg-zinc-900/50 border border-black/5 dark:border-white/5 hover:border-cyan-500/30 active:border-cyan-500/30 focus:border-cyan-500/30 focus:outline-none cursor-pointer p-8 rounded-2xl transition-colors duration-300"
                 >
-                  <div className="w-16 h-16 bg-white dark:bg-black rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-active:scale-110 group-focus:scale-110 transition-transform duration-300 shadow-inner shadow-black/5 dark:shadow-white/5">
-                    <Icon className="w-8 h-8 text-cyan-400" />
+                  <div className="w-16 h-16 bg-white dark:bg-[#000d11] rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 group-active:scale-110 group-focus:scale-110 transition-transform duration-300 shadow-inner shadow-black/5 dark:shadow-white/5">
+                    <Icon className="w-8 h-8 text-cyan-500" />
                   </div>
                   <h3 className="text-2xl font-bold text-black dark:text-white mb-4">{service.title}</h3>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{service.description}</p>

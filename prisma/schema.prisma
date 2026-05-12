@@ -125,6 +125,14 @@ model Settings {
 
   // Team Carousel
   teamCarouselDistance  Int     @default(380)
+  teamCarouselCardSize  Int     @default(280)
+  teamCarouselGrayscale Boolean @default(true)
+  teamHeaderTitle       String  @default("Small team,")
+  teamHeaderHighlight   String  @default("Big Production.")
+  teamBackgroundText    String  @default("big results")
+  teamBackgroundTextSize Int    @default(50)
+  teamBackgroundTextLineHeight Float @default(0.9)
+  teamCarouselStairOffset Int @default(100)
 
   // Footer
   footerTagline        String?

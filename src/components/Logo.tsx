@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
 
 interface LogoSettings {
   logoLightUrl: string;
@@ -9,22 +10,13 @@ interface LogoSettings {
 
 export default function Logo({ className = "h-8 w-auto" }: { className?: string }) {
   const { theme } = useTheme();
-  const [logos, setLogos] = useState<LogoSettings>({ logoLightUrl: '', logoDarkUrl: '' });
+  const { settings, loading } = useData();
   const [imgError, setImgError] = useState(false);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        setLogos({
-          logoLightUrl: data.logoLightUrl || '',
-          logoDarkUrl: data.logoDarkUrl || '',
-        });
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const logos = {
+    logoLightUrl: settings?.logoLightUrl || '',
+    logoDarkUrl: settings?.logoDarkUrl || '',
+  };
 
   // Reset error state when theme or logos change
   useEffect(() => {

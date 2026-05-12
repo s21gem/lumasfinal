@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
 
 interface Brand {
   id: string;
@@ -9,28 +10,13 @@ interface Brand {
 }
 
 export default function TrustedBy() {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [grayscale, setGrayscale] = useState(true);
-  const [marqueeSpeed, setMarqueeSpeed] = useState(40);
+  const { trustedBrands, settings, loading } = useData();
 
-  useEffect(() => {
-    fetch('/api/trusted-brands')
-      .then(r => r.json())
-      .then(setBrands)
-      .catch(console.error);
+  if (loading) return null; // Or a smaller skeleton
 
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data.trustedBrandsGrayscale !== undefined) {
-          setGrayscale(data.trustedBrandsGrayscale);
-        }
-        if (data.trustedBrandsMarqueeSpeed !== undefined) {
-          setMarqueeSpeed(data.trustedBrandsMarqueeSpeed);
-        }
-      })
-      .catch(console.error);
-  }, []);
+  const grayscale = settings?.trustedBrandsGrayscale ?? true;
+  const marqueeSpeed = settings?.trustedBrandsMarqueeSpeed ?? 40;
+  const brands = trustedBrands;
 
   // Fallback brands if none exist in DB
   const displayBrands: Brand[] = brands.length > 0 
@@ -71,7 +57,7 @@ export default function TrustedBy() {
   const duplicatedBrands = [...baseBrands, ...baseBrands];
 
   return (
-    <div className="w-full overflow-hidden bg-white/50 dark:bg-black/50 py-8 border-y border-black/5 dark:border-white/5 flex">
+    <div className="w-full overflow-hidden bg-white/50 dark:bg-[#000d11]/50 py-8 border-y border-black/5 dark:border-white/5 flex">
       
       <div className="w-full overflow-hidden relative group">
         <div className="max-w-7xl mx-auto px-6 mb-6 text-center">

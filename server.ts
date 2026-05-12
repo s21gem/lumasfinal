@@ -20,6 +20,7 @@ import uploadRoutes from "./server/routes/upload";
 import messagesRoutes from "./server/routes/messages";
 import appointmentsRoutes from "./server/routes/appointments";
 import schedulesRoutes from "./server/routes/schedules";
+import initRoutes from "./server/routes/init";
 
 async function startServer() {
   const app = express();
@@ -42,6 +43,7 @@ async function startServer() {
   app.use("/api/messages", messagesRoutes);
   app.use("/api/appointments", appointmentsRoutes);
   app.use("/api/schedules", schedulesRoutes);
+  app.use("/api/init-data", initRoutes);
 
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });

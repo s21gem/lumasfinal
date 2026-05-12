@@ -62,7 +62,7 @@ export default function Navbar() {
     <nav 
       className={`fixed w-full z-50 transition-all duration-300 ${
         scrolled 
-          ? 'bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-sm py-4' 
+          ? 'bg-white/80 dark:bg-[#000d11]/80 backdrop-blur-md shadow-sm py-4' 
           : 'bg-transparent py-6'
       }`}
     >
@@ -77,7 +77,7 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             <div className="border-beam-container p-[1.5px] rounded-full shadow-[0_0_25px_rgba(34,211,238,0.15)]">
-              <div className="flex items-center gap-2 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-xl px-2 py-2 rounded-full relative z-10">
+              <div className="flex items-center gap-2 bg-white/90 dark:bg-[#000d11]/90 backdrop-blur-xl px-2 py-2 rounded-full relative z-10">
                 {navLinks.map((link) => (
                   <div key={link.name} className="relative px-4 py-1.5">
                     <Link 
@@ -133,7 +133,7 @@ export default function Navbar() {
 
       {/* Mobile Nav Overlay */}
       {isOpen && (
-        <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-black border-t border-cyan-500/30 dark:border-cyan-400/30 shadow-[0_10px_40px_rgba(34,211,238,0.15)] flex flex-col items-center py-8 gap-6 animate-in slide-in-from-top-2">
+        <div className="md:hidden absolute top-full left-0 w-full bg-white dark:bg-[#000d11] border-t border-cyan-500/30 dark:border-cyan-400/30 shadow-[0_10px_40px_rgba(34,211,238,0.15)] flex flex-col items-center py-8 gap-6 animate-in slide-in-from-top-2">
           {navLinks.map((link) => (
             <Link 
               key={link.name} 

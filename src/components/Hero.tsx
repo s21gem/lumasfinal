@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import TrustedBy from './TrustedBy';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
+import { HeroSkeleton } from './ui/Skeleton';
 
 interface HeroSettings {
   heroSubtitle: string;
@@ -13,28 +15,13 @@ interface HeroSettings {
 }
 
 export default function Hero() {
-  const [settings, setSettings] = useState<HeroSettings | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { settings, loading } = useData();
 
-  useEffect(() => {
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        setSettings({
-          heroSubtitle: data.heroSubtitle || '',
-          heroTitle: data.heroTitle || '',
-          heroTitleHighlight: data.heroTitleHighlight || '',
-          heroDescription: data.heroDescription || '',
-          heroVideoUrl: data.heroVideoUrl || '',
-          calendlyUrl: data.calendlyUrl || '',
-        });
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  if (loading) return <HeroSkeleton />;
+  if (!settings) return null;
 
   return (
-    <section id="home" className="relative w-full h-screen flex flex-col justify-between overflow-hidden bg-white dark:bg-black !p-0">
+    <section id="home" className="relative w-full h-screen flex flex-col justify-between overflow-hidden bg-white dark:bg-[#000d11] !p-0">
       {/* Background Video */}
       <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-black">
         {settings?.heroVideoUrl && (
@@ -71,13 +58,12 @@ export default function Hero() {
             })()}
           </>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/20 to-white dark:from-black/60 dark:via-black/20 dark:to-black pointer-events-none"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/20 to-white dark:from-[#000d11]/60 dark:via-[#000d11]/20 dark:to-[#000d11] pointer-events-none"></div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center text-center px-6 max-w-5xl mx-auto pt-24 pb-12">
-        {!loading && settings && (
-          <>
+        <>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -106,7 +92,6 @@ export default function Hero() {
               {settings.heroDescription}
             </motion.p>
           </>
-        )}
       </div>
 
       {/* Bottom Marquee */}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useData } from '../context/DataContext';
 import { Calendar, MessageCircle, Phone, Mail, CheckCircle, AlertCircle, Loader2, Clock, User, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface ContactSettings {
@@ -14,17 +15,12 @@ interface Service {
 }
 
 export default function Booking() {
-  const [settings, setSettings] = useState<ContactSettings>({
-    phone: '+1 (555) 123-4567',
-    email: 'hello@lumascreative.com',
-    whatsappNumber: '',
-  });
+  const { settings: contextSettings, services: contextServices } = useData();
 
   const [mode, setMode] = useState<'book' | 'message'>('book');
 
   // Booking State
   const [step, setStep] = useState(1);
-  const [services, setServices] = useState<Service[]>([]);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -40,26 +36,19 @@ export default function Booking() {
   const [messageData, setMessageData] = useState({ name: '', email: '', message: '' });
   const [sendingMsg, setSendingMsg] = useState(false);
 
-  useEffect(() => {
-    // Fetch Settings
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        setSettings({
-          phone: data.phone || '+1 (555) 123-4567',
-          email: data.email || 'hello@lumascreative.com',
-          whatsappNumber: data.whatsappNumber || '',
-        });
-      }).catch(console.error);
+  const settings: ContactSettings = {
+    phone: contextSettings?.phone || '+1 (555) 123-4567',
+    email: contextSettings?.email || 'hello@lumascreative.com',
+    whatsappNumber: contextSettings?.whatsappNumber || '',
+  };
 
-    // Fetch Services
-    fetch('/api/services')
-      .then(r => r.json())
-      .then(data => {
-        setServices(data);
-        if (data.length > 0) setSelectedService(data[0].title);
-      }).catch(console.error);
-  }, []);
+  const services = contextServices;
+
+  useEffect(() => {
+    if (services.length > 0 && !selectedService) {
+      setSelectedService(services[0].title);
+    }
+  }, [services, selectedService]);
 
   // Fetch available slots when date changes
   useEffect(() => {
@@ -154,8 +143,8 @@ export default function Booking() {
   const today = new Date().toISOString().split('T')[0];
 
   return (
-    <section id="contact" className="py-16 md:py-32 bg-white dark:bg-black border-t border-black/5 dark:border-white/5 relative overflow-hidden !px-0">
-      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-400/5 blur-[200px] rounded-full pointer-events-none" />
+    <section id="contact" className="py-16 md:py-32 bg-white dark:bg-[#000d11] border-t border-black/5 dark:border-white/5 relative overflow-hidden !px-0">
+      <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-cyan-500/5 blur-[200px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
@@ -187,9 +176,9 @@ export default function Booking() {
 
             <h2 className="text-4xl md:text-5xl font-black text-black dark:text-white tracking-tighter mb-4 leading-[1.1]">
               {mode === 'book' ? (
-                <>Book Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500">Session.</span></>
+                <>Book Your <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-transparent bg-clip-text">Session.</span></>
               ) : (
-                <>Send Us A <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-fuchsia-500">Message.</span></>
+                <>Send Us A <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-transparent bg-clip-text">Message.</span></>
               )}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 max-w-md">
@@ -303,7 +292,7 @@ export default function Booking() {
                     <button 
                       onClick={() => setStep(2)}
                       disabled={!selectedService || !selectedDate}
-                      className="w-full mt-4 bg-black dark:bg-white text-white dark:text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full mt-4 bg-[#000d11] dark:bg-white text-white dark:text-[#000d11] font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Next: Choose Time <ChevronRight className="w-5 h-5" />
                     </button>
@@ -352,7 +341,7 @@ export default function Booking() {
                       <button 
                         onClick={() => setStep(3)}
                         disabled={!selectedSlot}
-                        className="flex-1 bg-black dark:bg-white text-white dark:text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 bg-[#000d11] dark:bg-white text-white dark:text-[#000d11] font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         Next: Your Details <ChevronRight className="w-5 h-5" />
                       </button>
@@ -373,11 +362,11 @@ export default function Booking() {
                         <input type="text" required placeholder="Full Name" value={details.name} onChange={e => setDetails({...details, name: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none" />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="email" required placeholder="Email Address" value={details.email} onChange={e => setDetails({...details, email: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none" />
+                         <input type="email" required placeholder="Email Address" value={details.email} onChange={e => setDetails({...details, email: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none" />
                         <input type="tel" required placeholder="Phone Number" value={details.phone} onChange={e => setDetails({...details, phone: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none" />
                       </div>
                       <div>
-                        <textarea rows={3} placeholder="Any notes or details about your project? (Optional)" value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none resize-none" />
+                         <textarea rows={3} placeholder="Any notes or details about your project? (Optional)" value={details.notes} onChange={e => setDetails({...details, notes: e.target.value})} className="w-full bg-white dark:bg-zinc-800 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-black dark:text-white focus:ring-2 focus:ring-cyan-400 outline-none resize-none" />
                       </div>
 
                       <div className="bg-cyan-500/10 p-4 rounded-xl mt-4">
@@ -452,7 +441,7 @@ export default function Booking() {
 
             <div className="flex flex-col gap-6 pt-8 border-t border-black/10 dark:border-white/10">
               <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="flex items-center gap-4 text-gray-600 dark:text-gray-400 hover:text-cyan-500 active:text-cyan-500 dark:hover:text-cyan-400 dark:active:text-cyan-400 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white dark:bg-black flex items-center justify-center border border-black/5 dark:border-white/5">
+                <div className="w-12 h-12 rounded-full bg-white dark:bg-[#000d11] flex items-center justify-center border border-black/5 dark:border-white/5">
                   <Phone className="w-5 h-5" />
                 </div>
                 <div>
@@ -462,7 +451,7 @@ export default function Booking() {
               </a>
               
               <a href={`mailto:${settings.email}`} className="flex items-center gap-4 text-gray-600 dark:text-gray-400 hover:text-cyan-500 active:text-cyan-500 dark:hover:text-cyan-400 dark:active:text-cyan-400 transition-colors">
-                <div className="w-12 h-12 rounded-full bg-white dark:bg-black flex items-center justify-center border border-black/5 dark:border-white/5">
+                <div className="w-12 h-12 rounded-full bg-white dark:bg-[#000d11] flex items-center justify-center border border-black/5 dark:border-white/5">
                   <Mail className="w-5 h-5" />
                 </div>
                 <div>

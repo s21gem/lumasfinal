@@ -34,6 +34,14 @@ router.get("/", async (req, res) => {
           defaultMeetingDuration: 30,
           businessHoursStart: "10:00",
           businessHoursEnd: "18:00",
+          teamCarouselCardSize: 280,
+          teamCarouselGrayscale: true,
+          teamHeaderTitle: "Small team,",
+          teamHeaderHighlight: "Big Production.",
+          teamBackgroundText: "big results",
+          teamBackgroundTextSize: 50,
+          teamBackgroundTextLineHeight: 0.9,
+          teamCarouselStairOffset: 100,
         },
       });
     }
@@ -73,6 +81,14 @@ router.put("/", requireAuth, async (req, res) => {
       youtubeUrl,
       // Team
       teamCarouselDistance,
+      teamCarouselCardSize,
+      teamCarouselGrayscale,
+      teamHeaderTitle,
+      teamHeaderHighlight,
+      teamBackgroundText,
+      teamBackgroundTextSize,
+      teamBackgroundTextLineHeight,
+      teamCarouselStairOffset,
       // Footer
       footerTagline,
       copyrightText,
@@ -117,6 +133,14 @@ router.put("/", requireAuth, async (req, res) => {
     if (linkedinUrl !== undefined) updateData.linkedinUrl = linkedinUrl;
     if (youtubeUrl !== undefined) updateData.youtubeUrl = youtubeUrl;
     if (teamCarouselDistance !== undefined) updateData.teamCarouselDistance = teamCarouselDistance;
+    if (teamCarouselCardSize !== undefined) updateData.teamCarouselCardSize = teamCarouselCardSize;
+    if (teamCarouselGrayscale !== undefined) updateData.teamCarouselGrayscale = teamCarouselGrayscale;
+    if (teamHeaderTitle !== undefined) updateData.teamHeaderTitle = teamHeaderTitle;
+    if (teamHeaderHighlight !== undefined) updateData.teamHeaderHighlight = teamHeaderHighlight;
+    if (teamBackgroundText !== undefined) updateData.teamBackgroundText = teamBackgroundText;
+    if (teamBackgroundTextSize !== undefined) updateData.teamBackgroundTextSize = teamBackgroundTextSize;
+    if (teamBackgroundTextLineHeight !== undefined) updateData.teamBackgroundTextLineHeight = teamBackgroundTextLineHeight;
+    if (teamCarouselStairOffset !== undefined) updateData.teamCarouselStairOffset = teamCarouselStairOffset;
     if (footerTagline !== undefined) updateData.footerTagline = footerTagline;
     if (copyrightText !== undefined) updateData.copyrightText = copyrightText;
     if (siteTitle !== undefined) updateData.siteTitle = siteTitle;
@@ -137,6 +161,14 @@ router.put("/", requireAuth, async (req, res) => {
       create: {
         id: "global",
         teamCarouselDistance: teamCarouselDistance ?? 380,
+        teamCarouselCardSize: teamCarouselCardSize ?? 280,
+        teamCarouselGrayscale: teamCarouselGrayscale ?? true,
+        teamHeaderTitle: teamHeaderTitle ?? "Small team,",
+        teamHeaderHighlight: teamHeaderHighlight ?? "Big Production.",
+        teamBackgroundText: teamBackgroundText ?? "big results",
+        teamBackgroundTextSize: teamBackgroundTextSize ?? 50,
+        teamBackgroundTextLineHeight: teamBackgroundTextLineHeight ?? 0.9,
+        teamCarouselStairOffset: teamCarouselStairOffset ?? 100,
         ...updateData,
       },
     });

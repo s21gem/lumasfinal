@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Instagram, Twitter, Linkedin, Youtube } from 'lucide-react';
 import Logo from './Logo';
+import { useData } from '../context/DataContext';
 
 interface FooterSettings {
   footerTagline: string;
@@ -24,46 +25,35 @@ interface ServiceItem {
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  const [settings, setSettings] = useState<FooterSettings>({
-    footerTagline: 'A creative production and post-production studio helping brands turn ideas into conversion-driven assets.',
-    copyrightText: 'Lumas Creative Studio',
-    phone: '', email: '', address: '123 Creative Blvd, Suite 400', city: 'Los Angeles, CA 90015',
-    instagramUrl: '', twitterUrl: '', linkedinUrl: '', youtubeUrl: '',
-    privacyPolicy: '', termsOfService: '',
-  });
-  const [services, setServices] = useState<ServiceItem[]>([]);
+  const { settings, services: contextServices, loading } = useData();
 
-  useEffect(() => {
-    fetch('/api/settings').then(r => r.json()).then(data => {
-      setSettings(prev => ({
-        footerTagline: data.footerTagline || prev.footerTagline,
-        copyrightText: data.copyrightText || prev.copyrightText,
-        phone: data.phone || prev.phone,
-        email: data.email || prev.email,
-        address: data.address || prev.address,
-        city: data.city || prev.city,
-        instagramUrl: data.instagramUrl || '',
-        twitterUrl: data.twitterUrl || '',
-        linkedinUrl: data.linkedinUrl || '',
-        youtubeUrl: data.youtubeUrl || '',
-        privacyPolicy: data.privacyPolicy || '',
-        termsOfService: data.termsOfService || '',
-      }));
-    }).catch(console.error);
-
-    fetch('/api/services').then(r => r.json()).then(setServices).catch(console.error);
-  }, []);
-
-  const socialLinks = [
-    { url: settings.instagramUrl, icon: Instagram },
-    { url: settings.twitterUrl, icon: Twitter },
-    { url: settings.linkedinUrl, icon: Linkedin },
-    { url: settings.youtubeUrl, icon: Youtube },
-  ].filter(s => s.url);
-  
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalContent, setModalContent] = useState('');
+
+  const displaySettings: FooterSettings = {
+    footerTagline: settings?.footerTagline || 'A creative production and post-production studio helping brands turn ideas into conversion-driven assets.',
+    copyrightText: settings?.copyrightText || 'Lumas Creative Studio',
+    phone: settings?.phone || '',
+    email: settings?.email || '',
+    address: settings?.address || '123 Creative Blvd, Suite 400',
+    city: settings?.city || 'Los Angeles, CA 90015',
+    instagramUrl: settings?.instagramUrl || '',
+    twitterUrl: settings?.twitterUrl || '',
+    linkedinUrl: settings?.linkedinUrl || '',
+    youtubeUrl: settings?.youtubeUrl || '',
+    privacyPolicy: settings?.privacyPolicy || '',
+    termsOfService: settings?.termsOfService || '',
+  };
+
+  const services = contextServices;
+
+  const socialLinks = [
+    { url: displaySettings.instagramUrl, icon: Instagram },
+    { url: displaySettings.twitterUrl, icon: Twitter },
+    { url: displaySettings.linkedinUrl, icon: Linkedin },
+    { url: displaySettings.youtubeUrl, icon: Youtube },
+  ].filter(s => s.url);
 
   const openPolicy = (title: string, content: string) => {
     setModalTitle(title);
@@ -78,7 +68,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-white dark:bg-black py-16 border-t border-black/10 dark:border-white/10">
+    <footer className="bg-white dark:bg-[#000d11] py-16 border-t border-black/10 dark:border-white/10">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16 text-center md:text-left">
           
@@ -88,7 +78,7 @@ export default function Footer() {
               <Logo className="h-16 md:h-20" />
             </a>
             <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed max-w-xs">
-              {settings.footerTagline}
+              {displaySettings.footerTagline}
             </p>
           </div>
 
@@ -132,8 +122,8 @@ export default function Footer() {
               </div>
             )}
             <div className="text-sm text-gray-600 dark:text-gray-400">
-              {settings.address && <p>{settings.address}</p>}
-              {settings.city && <p>{settings.city}</p>}
+              {displaySettings.address && <p>{displaySettings.address}</p>}
+              {displaySettings.city && <p>{displaySettings.city}</p>}
             </div>
           </div>
         </div>
@@ -141,17 +131,17 @@ export default function Footer() {
         {/* Bottom */}
         <div className="pt-8 border-t border-black/10 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <p className="text-gray-500 text-sm">
-            &copy; {currentYear} {settings.copyrightText}. All rights reserved.
+            &copy; {currentYear} {displaySettings.copyrightText}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <button 
-              onClick={() => openPolicy('Privacy Policy', settings.privacyPolicy)}
+              onClick={() => openPolicy('Privacy Policy', displaySettings.privacyPolicy)}
               className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors cursor-pointer"
             >
               Privacy Policy
             </button>
             <button 
-              onClick={() => openPolicy('Terms of Service', settings.termsOfService)}
+              onClick={() => openPolicy('Terms of Service', displaySettings.termsOfService)}
               className="text-gray-500 hover:text-black active:text-black dark:hover:text-white dark:active:text-white text-sm transition-colors cursor-pointer"
             >
               Terms of Service

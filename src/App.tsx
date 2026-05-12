@@ -11,6 +11,7 @@ import Testimonials from './components/Testimonials';
 import Booking from './components/Booking';
 import Footer from './components/Footer';
 import { ThemeProvider } from './components/ThemeContext';
+import { DataProvider } from './context/DataContext';
 import SEO from './components/SEO';
 
 // Admin Pages
@@ -54,7 +55,8 @@ function HomePage() {
 function App() {
   return (
     <ThemeProvider>
-      <SEO />
+      <DataProvider>
+        <SEO />
       <Router>
         <Routes>
           {/* Public Routes */}
@@ -112,6 +114,7 @@ function App() {
           </Route>
         </Routes>
       </Router>
+      </DataProvider>
     </ThemeProvider>
   );
 }

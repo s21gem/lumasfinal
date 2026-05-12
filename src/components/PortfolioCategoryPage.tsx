@@ -54,7 +54,7 @@ const ProjectMedia = ({ project, onPlay }: { project: Project, onPlay: () => voi
         onClick={onPlay}
         className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors"
       >
-        <div className="w-16 h-16 rounded-full bg-cyan-400/90 backdrop-blur-sm flex items-center justify-center text-black shadow-xl transform group-hover:scale-110 transition-transform duration-300">
+        <div className="w-16 h-16 rounded-full bg-cyan-500/90 backdrop-blur-sm flex items-center justify-center text-white shadow-xl transform group-hover:scale-110 transition-transform duration-300">
           <Play className="w-6 h-6 ml-1" fill="currentColor" />
         </div>
       </button>
@@ -62,10 +62,10 @@ const ProjectMedia = ({ project, onPlay }: { project: Project, onPlay: () => voi
   );
 };
 
-const ProjectCard = ({ project, isRow = false, onPlay }: { project: Project, isRow?: boolean, onPlay: () => void }) => (
+const ProjectCard = ({ project, isRow = false, onPlay }: { project: Project, isRow?: boolean, onPlay: () => void, key?: string | number }) => (
   <div className={`flex flex-col bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden shadow-lg border border-black/5 dark:border-white/5 ${isRow ? 'w-[240px] md:w-[280px] lg:w-[320px] shrink-0' : 'w-full'}`}>
     {/* Media */}
-    <div className="w-full aspect-video relative bg-zinc-100 dark:bg-black">
+    <div className="w-full aspect-video relative bg-zinc-100 dark:bg-[#000d11]">
       <ProjectMedia project={project} onPlay={onPlay} />
     </div>
     
@@ -86,7 +86,7 @@ const ProjectCard = ({ project, isRow = false, onPlay }: { project: Project, isR
       )}
       {project.results && (
         <div className="inline-flex items-center gap-1.5 bg-zinc-50 dark:bg-zinc-950 border border-black/5 dark:border-white/5 px-2 py-1 rounded-lg w-fit mt-auto">
-          <span className="w-1 h-1 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
+          <span className="w-1 h-1 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.5)]" />
           <span className="font-bold text-[9px] text-black dark:text-white">{project.results}</span>
         </div>
       )}
@@ -127,7 +127,7 @@ const InfiniteColumn = React.forwardRef(({ projects, direction, speed = 1, onPla
   useEffect(() => {
     if (!setRef.current) return;
     const observer = new ResizeObserver((entries) => {
-      setContentHeight(entries[0].target.offsetHeight);
+      setContentHeight((entries[0].target as HTMLElement).offsetHeight);
     });
     observer.observe(setRef.current);
     return () => observer.disconnect();
@@ -217,7 +217,7 @@ const InfiniteRow = React.forwardRef(({ projects, direction, speed = 1, onPlay }
   useEffect(() => {
     if (!setRef.current) return;
     const observer = new ResizeObserver((entries) => {
-      setContentWidth(entries[0].target.offsetWidth);
+      setContentWidth((entries[0].target as HTMLElement).offsetWidth);
     });
     observer.observe(setRef.current);
     return () => observer.disconnect();
@@ -363,9 +363,9 @@ export default function PortfolioCategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white pt-28">
+      <div className="min-h-screen bg-white dark:bg-[#000d11] text-black dark:text-white pt-28">
         <div className="flex items-center justify-center h-64">
-          <div className="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-cyan-400 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-violet-500 rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -373,7 +373,7 @@ export default function PortfolioCategoryPage() {
 
   if (projects.length === 0) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white pt-28 px-6">
+      <div className="min-h-screen bg-white dark:bg-[#000d11] text-black dark:text-white pt-28 px-6">
         <div className="max-w-7xl mx-auto py-20 text-center">
           <p className="text-xl text-zinc-500">No projects in this category yet.</p>
           <Link to="/" className="text-cyan-500 font-medium mt-4 inline-block hover:underline">Go Home</Link>
@@ -386,9 +386,9 @@ export default function PortfolioCategoryPage() {
   const row2Projects = projects.filter((_, i) => i % 2 === 1);
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-black dark:text-white flex flex-col relative">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#000d11] text-black dark:text-white flex flex-col relative">
       {/* Header with significantly reduced size */}
-      <div className="pt-20 pb-4 px-6 bg-zinc-50 dark:bg-zinc-950 border-b border-black/5 dark:border-white/5 flex-shrink-0 z-10 shadow-sm relative">
+      <div className="pt-20 pb-4 px-6 bg-zinc-50 dark:bg-[#000d11] border-b border-black/5 dark:border-white/5 flex-shrink-0 z-10 shadow-sm relative">
         <div className="max-w-[1800px] mx-auto flex flex-row justify-between items-end gap-4 relative z-10">
           <div>
             <Link to="/#portfolio" className="inline-flex items-center gap-2 text-cyan-500 hover:text-cyan-400 font-medium mb-2 transition-colors uppercase tracking-widest text-[10px]">

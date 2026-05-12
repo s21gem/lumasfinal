@@ -1,6 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { getMediaUrl } from '../utils/media';
+import { useData } from '../context/DataContext';
+import { TeamSkeleton } from './ui/Skeleton';
 
 interface TeamMember {
   id: string;
@@ -10,54 +12,44 @@ interface TeamMember {
 }
 
 export default function Team() {
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [carouselDistance, setCarouselDistance] = useState(380);
-  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [membersRes, settingsRes] = await Promise.all([
-          fetch('/api/team'),
-          fetch('/api/settings')
-        ]);
-        
-        if (membersRes.ok) {
-          const data = await membersRes.json();
-          setTeamMembers(data);
-        }
-        
-        if (settingsRes.ok) {
-          const settingsData = await settingsRes.json();
-          setCarouselDistance(settingsData.teamCarouselDistance || 380);
-        }
-      } catch (error) {
-        console.error('Failed to fetch team data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+  const { teamMembers, settings, loading } = useData();
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   });
 
-  // Parallax movements
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
   const textY = useTransform(scrollYProgress, [0, 1], ['-20%', '20%']);
   const carouselY = useTransform(scrollYProgress, [0, 1], [200, -200]);
 
-  // Staggered vertical offsets and tilts for the cards to match the organic look
-  const yOffsets = [40, -30, 20, -40, 30, -20, 50, -10, 40, -30, 20, -40];
+  if (loading) {
+    return (
+      <section ref={containerRef} className="relative min-h-screen bg-white dark:bg-[#000d11] overflow-hidden flex flex-col items-center justify-center py-24 md:py-32">
+        <TeamSkeleton />
+      </section>
+    );
+  }
+
+  if (!settings) return null;
+
+  const carouselDistance = settings.teamCarouselDistance ?? 380;
+  const cardSize = settings.teamCarouselCardSize ?? 280;
+  const isGrayscale = settings.teamCarouselGrayscale ?? true;
+  const headerTitle = settings.teamHeaderTitle ?? 'Compact team,';
+  const headerHighlight = settings.teamHeaderHighlight ?? 'Big Production.';
+  const bgText = settings.teamBackgroundText ?? 'big results';
+  const bgTextSize = settings.teamBackgroundTextSize ?? 50;
+  const bgTextLineHeight = settings.teamBackgroundTextLineHeight ?? 0.9;
+  const stairOffset = settings.teamCarouselStairOffset ?? 100;
+
+  // Remove the static random yOffsets. We will calculate it dynamically.
   const rotations = [-4, 3, -5, 4, -3, 5, -6, 2, -4, 3, -5, 4];
 
   return (
-    <section ref={containerRef} className="relative min-h-screen bg-white dark:bg-black overflow-hidden flex flex-col items-center justify-center py-24 md:py-32">
+    <section ref={containerRef} className="relative min-h-screen bg-white dark:bg-[#000d11] overflow-hidden flex flex-col items-center justify-center py-24 md:py-32">
       <style>{`
         .perspective-container {
           perspective: 1200px;
@@ -85,26 +77,28 @@ export default function Team() {
         style={{ y: textY }}
         className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden"
       >
-        <h2 className="text-[40vw] md:text-[30vw] font-black text-black/5 dark:text-white/10 leading-[0.75] tracking-tighter text-center lowercase select-none whitespace-nowrap">
-          big results
+        <h2 
+          className="font-black text-cyan-600/15 dark:text-white/10 tracking-tighter text-center lowercase select-none whitespace-pre-line"
+          style={{
+            fontSize: `clamp(40px, ${bgTextSize}vw, 800px)`,
+            lineHeight: bgTextLineHeight
+          }}
+        >
+          {bgText}
         </h2>
       </motion.div>
 
       {/* Header Text */}
       <div className="relative md:absolute md:top-24 text-center z-20 px-6 mb-16 md:mb-0">
         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-black dark:text-white tracking-tighter mb-6">
-          Compact Team. <br />
-          <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-transparent bg-clip-text">Big Production.</span>
+          {headerTitle} <br />
+          <span className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-transparent bg-clip-text">{headerHighlight}</span>
         </h2>
       </div>
 
-      {loading || teamMembers.length === 0 ? (
+      {teamMembers.length === 0 ? (
         <div className="relative z-10 w-full flex items-center justify-center min-h-[500px]">
-          {loading ? (
-            <div className="w-12 h-12 border-4 border-black/10 dark:border-white/10 border-t-black dark:border-t-white rounded-full animate-spin"></div>
-          ) : (
-            <p className="text-zinc-500 dark:text-zinc-400">No team members found.</p>
-          )}
+          <p className="text-zinc-500 dark:text-zinc-400">No team members found.</p>
         </div>
       ) : (
         <>
@@ -124,9 +118,9 @@ export default function Team() {
                 >
                   {member.imageUrl ? (
                     <img
-                      src={getMediaUrl(member.imageUrl)}
+                      src={getMediaUrl(member.imageUrl, 'team')}
                       alt={member.name}
-                      className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0 transition-all duration-500"
+                      className={`w-full h-full object-cover transition-all duration-500 ${isGrayscale ? 'grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0' : ''}`}
                       referrerPolicy="no-referrer"
                     />
                   ) : (
@@ -159,13 +153,28 @@ export default function Team() {
               <motion.div
                 animate={{ rotateY: [0, -360] }}
                 transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-                className="relative w-52 h-64 preserve-3d"
-                style={{ animationPlayState: isCarouselHovered ? 'paused' : 'running' }}
+                className="relative preserve-3d"
+                style={{ 
+                  animationPlayState: isCarouselHovered ? 'paused' : 'running',
+                  width: `${cardSize}px`,
+                  height: `${cardSize * 1.25}px`
+                }}
               >
                 {teamMembers.map((member, index) => {
-                  const angle = (index / teamMembers.length) * 360;
-                  const yOffset = yOffsets[index % yOffsets.length];
+                  const total = teamMembers.length;
+                  const angle = (index / total) * 360;
+                  
+                  // Staircase hierarchy: subtle difference from top to bottom
+                  // Reduced span to make the "stair steps" much smaller
+                  const yOffset = -(stairOffset / 2) + (index * (stairOffset / Math.max(1, total - 1))); 
+                  
+                  // Keep a slight organic tilt
                   const rotation = rotations[index % rotations.length];
+
+                  // "Slightly forward" illusion can be enhanced by slightly altering the Z translation
+                  // but in a rotating carousel, constant radius is usually best to avoid clipping.
+                  // We'll add a tiny scale boost to the front-most cards based on their index if needed,
+                  // but standard 3D perspective already handles the "forward" feeling dynamically as they rotate.
 
                   return (
                     <div
@@ -181,9 +190,9 @@ export default function Team() {
                     >
                       {member.imageUrl ? (
                         <img
-                          src={getMediaUrl(member.imageUrl)}
+                          src={getMediaUrl(member.imageUrl, 'team')}
                           alt={member.name}
-                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0 transition-all duration-500"
+                          className={`w-full h-full object-cover transition-all duration-500 ${isGrayscale ? 'grayscale group-hover:grayscale-0 group-active:grayscale-0 group-focus:grayscale-0' : ''}`}
                           referrerPolicy="no-referrer"
                         />
                       ) : (

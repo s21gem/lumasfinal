@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  lumas-portfolio:
+    build: .
+    container_name: lumas-portfolio
+    restart: always
+    env_file: .env
+    volumes:
+      - ./prisma:/app/prisma
+      - ./uploads:/app/uploads
+    networks:
+      - traefik-public # Adjust to your traefik network name
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lumas.rule=Host(`yourdomain.com`) || Host(`www.yourdomain.com`)"
+      - "traefik.http.routers.lumas.entrypoints=websecure"
+      - "traefik.http.routers.lumas.tls=true"
+      - "traefik.http.routers.lumas.tls.certresolver=letsencrypt" # Adjust to your resolver
+      - "traefik.http.services.lumas.loadbalancer.server.port=3001"
+
+networks:
+  traefik-public:
+    external: true
