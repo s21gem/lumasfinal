@@ -5,6 +5,8 @@ services:
     build: .
     container_name: lumas-portfolio
     restart: always
+    environment:
+      - NODE_ENV=production
     env_file: .env
     volumes:
       - ./prisma:/app/prisma
