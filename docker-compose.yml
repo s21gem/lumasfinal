@@ -9,17 +9,10 @@ services:
     volumes:
       - ./prisma:/app/prisma
       - ./uploads:/app/uploads
-    networks:
-      - traefik-public # Adjust to your traefik network name
-
+    # No external network needed because Traefik is in 'host' mode on your VPS
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.lumas.rule=Host(`lumascreative.com`) || Host(`www.lumascreative.com`)"
       - "traefik.http.routers.lumas.entrypoints=websecure"
-      - "traefik.http.routers.lumas.tls=true"
-      - "traefik.http.routers.lumas.tls.certresolver=letsencrypt" # Adjust to your resolver
+      - "traefik.http.routers.lumas.rule=Host(`lumascreative.com`) || Host(`www.lumascreative.com`)"
+      - "traefik.http.routers.lumas.tls.certresolver=letsencrypt"
       - "traefik.http.services.lumas.loadbalancer.server.port=3001"
-
-networks:
-  traefik-public:
-    external: true
